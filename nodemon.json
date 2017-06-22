@@ -1,0 +1,6 @@
+{
+	"ignore": [
+		"source-storage",
+		"dist/client-code"
+	]
+}

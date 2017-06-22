@@ -1,0 +1,29 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"lib": ["es5", "es6", "es7", "es2015.promise", "es2015.proxy", "dom"],
+		"moduleResolution": "node",
+		"declaration": true,
+		"noEmitOnError": true,
+		"noImplicitThis": true,
+		"noImplicitAny": false,
+		"removeComments": false,
+		"preserveConstEnums": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": false,
+		"pretty": false,
+		"sourceMap": true,
+		"sourceRoot": "./",
+		"baseUrl": "./",
+		"outDir": "../dist",
+		"rootDir": "./",
+		"paths": {
+			"@gongt/ts-stl-server": ["../node_modules/@gongt/ts-stl-server"],
+			"@gongt/ts-stl-library": ["../node_modules/@gongt/ts-stl-library"]
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"name": "jspm-cdn",
+	"version": "1.0.0",
+	"private": true,
+	"description": "automantic jspm package",
+	"main": "index.js",
+	"license": "WTFPL",
+	"jspm": true
+}

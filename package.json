@@ -1,0 +1,102 @@
+{
+	"name": "@gongt/jspm-cdn",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "microbuild build",
+		"service": "microbuild control"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GongT/jspm-cdn.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/GongT/jspm-cdn/issues"
+	},
+	"homepage": "https://github.com/GongT/jspm-cdn#readme",
+	"private": true,
+	"dependencies": {
+		"@gongt/jenv-data": "^1.2.3",
+		"@types/fs-extra": "^3.0.3",
+		"@types/node": "^7.0.29",
+		"@types/serve-static": "^1.7.31",
+		"child-process-promise": "git+ssh://git@github.com/GongT/child-process-promise.git",
+		"ejs": "^2.5.6",
+		"express": "^4.15.3",
+		"extend": "^3.0.1",
+		"fs-extra": "^3.0.1",
+		"jspm": ">=0.17.0-beta.41",
+		"mongoose": "^4.10.5",
+		"morgan": "^1.8.2",
+		"primus": "^7.0.2",
+		"serve-index": "^1.9.0",
+		"serve-static": "^1.12.3",
+		"systemd-daemon": "^1.1.0",
+		"ws": "^3.0.0"
+	},
+	"devDependencies": {
+		"@types/prismjs": "^1.6.2",
+		"@types/xterm": "^2.0.3"
+	},
+	"jspm": {
+		"directories": {
+			"baseURL": "public"
+		},
+		"configFile": "public/jspm.config.js",
+		"dependencies": {
+			"clipboard": "npm:clipboard@^1.7.1",
+			"css": "github:systemjs/plugin-css@^0.1.35",
+			"xterm": "npm:xterm@^2.7.0",
+			"prismjs": "npm:prismjs@1.5.1"
+		},
+		"devDependencies": {},
+		"peerDependencies": {
+			"assert": "npm:jspm-nodelibs-assert@^0.2.0",
+			"buffer": "npm:jspm-nodelibs-buffer@^0.2.0",
+			"child_process": "npm:jspm-nodelibs-child_process@^0.2.0",
+			"constants": "npm:jspm-nodelibs-constants@^0.2.0",
+			"crypto": "npm:jspm-nodelibs-crypto@^0.2.0",
+			"domain": "npm:jspm-nodelibs-domain@^0.2.0",
+			"events": "npm:jspm-nodelibs-events@^0.2.0",
+			"fs": "npm:jspm-nodelibs-fs@^0.2.0",
+			"http": "npm:jspm-nodelibs-http@^0.2.0",
+			"https": "npm:jspm-nodelibs-https@^0.2.0",
+			"os": "npm:jspm-nodelibs-os@^0.2.0",
+			"path": "npm:jspm-nodelibs-path@^0.2.0",
+			"process": "npm:jspm-nodelibs-process@^0.2.0",
+			"react": "npm:react@^15.0.0",
+			"stream": "npm:jspm-nodelibs-stream@^0.2.0",
+			"string_decoder": "npm:jspm-nodelibs-string_decoder@^0.2.0",
+			"url": "npm:jspm-nodelibs-url@^0.2.0",
+			"util": "npm:jspm-nodelibs-util@^0.2.0",
+			"vm": "npm:jspm-nodelibs-vm@^0.2.0",
+			"zlib": "npm:jspm-nodelibs-zlib@^0.2.0"
+		},
+		"overrides": {
+			"npm:browserify-zlib@0.1.4": {
+				"dependencies": {
+					"readable-stream": "^2.0.2",
+					"pako": "~0.2.0"
+				},
+				"map": {
+					"_stream_transform": "readable-stream/transform"
+				}
+			},
+			"npm:inherits@2.0.3": {
+				"ignore": [
+					"test.js"
+				]
+			},
+			"npm:pbkdf2@3.0.12": {
+				"main": "browser.js"
+			},
+			"npm:safe-buffer@5.1.1": {
+				"browser": "index.js"
+			}
+		}
+	}
+}
