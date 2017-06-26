@@ -39,11 +39,15 @@ export function runJspm(...argument: string[]): Promise<{output: string}&ChildPr
 }
 
 export function forkJspm(...argument: string[]): ChildProcess {
-	return spawnNative(jspm, argument, {
+	const child = spawnNative(jspm, argument, {
 		cwd: getStorageBaseFolder(),
 		stdio: ['pipe', 'pipe', 'pipe'],
 		env: process.env,
 	});
+	child.on('exit', () => {
+		console.log('jspm end: %s', argument);
+	});
+	return child;
 }
 
 export async function tryRunJspm(context: DownloadRequestContext<any>,
@@ -59,7 +63,7 @@ export async function tryRunJspm(context: DownloadRequestContext<any>,
 }
 
 const debug = createLogger(LOG_LEVEL.ERROR, 'process');
-export function killProcess(process: ChildProcess): Promise<string> {
+export function killProcess(process: ChildProcess, SIGNAL: string = 'SIGHUP'): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let to = setTimeout(() => {
 			to = null;
@@ -75,6 +79,6 @@ export function killProcess(process: ChildProcess): Promise<string> {
 		if (process.connected) {
 			process.disconnect();
 		}
-		process.kill('SIGHUP');
+		process.kill(SIGNAL);
 	});
 }

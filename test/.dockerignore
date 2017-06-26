@@ -23,7 +23,5 @@ build.config.ts
 !.micro-build/docker/package-json
 !.micro-build/docker/plugins
 dist/
-dist/client-code/
-dist/simple-package/
-source-storage
+public/client/
 ### <<< END MICRO-BUILD SECTION

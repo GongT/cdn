@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "es6",
-		"lib": ["es5", "es6", "es7", "es2015.promise", "es2015.proxy", "es2017.object", "dom"],
+		"lib": ["es5", "es6", "es7", "dom"],
 		"moduleResolution": "node",
 		"declaration": true,
 		"noEmitOnError": true,
@@ -18,12 +18,12 @@
 		"pretty": false,
 		"sourceMap": true,
 		"sourceRoot": "./",
-		"baseUrl": "./",
-		"outDir": "../dist",
+		"outDir": "../../dist/simple-package",
 		"rootDir": "./",
+		"baseUrl": "./",
 		"paths": {
-			"@gongt/ts-stl-server": ["../node_modules/@gongt/ts-stl-server"],
-			"@gongt/ts-stl-library": ["../node_modules/@gongt/ts-stl-library"]
+			"@gongt/ts-stl-server": ["../node_modules/@gongt/ts-stl-server"]
 		}
-	}
+	},
+	"files": ["./index.ts"]
 }

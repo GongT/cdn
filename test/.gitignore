@@ -14,10 +14,5 @@ screen.*
 !.*ignore
 !.gitinclude
 dist/
-dist/client-code/
-dist/simple-package/
-source-storage
-server/simple-package/global.ts
+public/client/
 ### <<< END MICRO-BUILD SECTION
-
-**/jspm_packages/

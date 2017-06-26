@@ -35,4 +35,14 @@ document.getElementById('btnReconnect').addEventListener('click', () => {
 document.getElementById('btnClear').addEventListener('click', () => {
 	Terminal.clear();
 });
+document.getElementById('btnEnd').addEventListener('click', () => {
+	Connection.emit('end', []);
+});
+document.getElementById('btnKill').addEventListener('click', () => {
+	Connection.emit('kill', ['SIGKILL']);
+});
+document.getElementById('btnTerm').addEventListener('click', () => {
+	Connection.emit('kill', ['SIGTERM']);
+});
+
 

@@ -6,7 +6,7 @@ import {initServiceWait} from "@gongt/ts-stl-server/boot/init-systemd-service";
 import {CrossDomainMiddleware} from "@gongt/ts-stl-server/communication/crossdomain/middleware";
 import {initDefaultDatabaseConnection, waitDatabaseToConnect} from "@gongt/ts-stl-server/database/mongodb";
 import {resolve} from "path";
-import {getBundleFolder, getStorageBaseFolder, initStorage} from "./library/files";
+import {getStorageBaseFolder, initStorage} from "./library/files";
 import {createWebSocket} from "./provider/jspm-real-time";
 import {mountBrowser} from "./route/browser";
 import {initJspmConfig} from "./route/client-jspm";

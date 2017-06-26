@@ -1,0 +1,25 @@
+{
+	"name": "@gongt/jspm",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GongT/jspm-cdn.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/GongT/jspm-cdn/issues"
+	},
+	"homepage": "https://github.com/GongT/jspm-cdn#readme",
+	"private": false,
+	"dependencies": {
+		"@gongt/ts-stl-server": "latest",
+		"@gongt/jenv-data": "latest"
+	},
+	"devDependencies": {
+	}
+}

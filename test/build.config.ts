@@ -14,7 +14,7 @@ declare const helper: MicroBuildHelper;
 
 /* Example config file */
 
-const projectName = 'jspm';
+const projectName = 'test';
 
 build.baseImage('node', 'alpine');
 build.projectName(projectName);
@@ -24,11 +24,10 @@ build.isInChina(JsonEnv.gfw.isInChina, JsonEnv.gfw);
 build.npmCacheLayer(JsonEnv.gfw.npmRegistry);
 build.npmInstall('./package.json');
 
-build.forwardPort(80, 'tcp');
-build.listenPort(3323);
+build.listenPort(3324);
 
 build.environmentVariable('MAIN_FILE', './dist/index.js');
-build.startupCommand('./node_modules/.bin/ts-app-loader');
+build.startupCommand('../node_modules/.bin/ts-app-loader');
 build.shellCommand('node');
 
 build.addPlugin(EPlugins.jenv);
@@ -39,16 +38,5 @@ build.addPlugin(EPlugins.typescript, {
 });
 build.addPlugin(EPlugins.typescript, {
 	source: 'client',
-	target: 'dist/client-code',
+	target: 'public/client',
 });
-build.addPlugin(EPlugins.typescript, {
-	source: 'server/simple-package',
-	target: 'dist/simple-package',
-});
-
-build.onConfig(() => {
-	const file = helper.createTextFile('export const PROJECT_NAME:string = ' + JSON.stringify(process.env.PROJECT_NAME));
-	file.save('server/simple-package/global.ts')
-});
-
-build.volume('source-storage', '/data/source-storage');

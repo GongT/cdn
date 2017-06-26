@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "es6",
-		"lib": ["es5", "es6", "es7", "es2015.promise", "es2015.proxy", "es2017.object", "dom"],
+		"lib": ["es5", "es6", "es7", "es2015.promise", "es2015.proxy", "dom"],
 		"moduleResolution": "node",
 		"declaration": true,
 		"noEmitOnError": true,
@@ -19,10 +19,10 @@
 		"sourceMap": true,
 		"sourceRoot": "./",
 		"baseUrl": "./",
-		"outDir": "../dist",
+		"outDir": "../public/client",
 		"rootDir": "./",
 		"paths": {
-			"@gongt/ts-stl-server": ["../node_modules/@gongt/ts-stl-server"],
+			"@gongt/ts-stl-client": ["../node_modules/@gongt/ts-stl-client"],
 			"@gongt/ts-stl-library": ["../node_modules/@gongt/ts-stl-library"]
 		}
 	}
