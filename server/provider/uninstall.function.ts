@@ -1,15 +1,12 @@
-import {
-	loadSystemjsConfigFileMultiParts,
-	ModuleFileMapping,
-	SystemjsConfigFile,
-} from "@gongt/ts-stl-server/express/render/jspm";
+import {ModuleFileMapping, SystemjsConfigFile} from "@gongt/ts-stl-client/jspm/defines";
+import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
 import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm.write";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {generateJspmConfig} from "../route/jspm.config";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export function findFullFormat(configs: SystemjsConfigFile[], packageBase: string) {
-	let ret: string;
+	let ret: string = '';
 	configs.some((config) => {
 		if (config.map &&
 		    config.map[packageBase] &&
