@@ -1,14 +1,14 @@
 import {createLogger} from "@gongt/ts-stl-server/debug";
 import {LOG_LEVEL} from "@gongt/ts-stl-server/log/levels";
 import {ChildProcess} from "child_process";
-import {readFile, unlink} from "fs-extra";
+import {unlink} from "fs-extra";
 import {fileExists} from "../library/file-exists";
-import {getBundleLocation, getBundleTempLocation} from "../library/files";
 import {forkJspm, killProcess} from "../library/run-cmd";
+import {handleControlAction} from "./socket-actions";
 
 const debug = createLogger(LOG_LEVEL.ERROR, 'socket');
 
-class TransitionHandler {
+export class TransitionHandler {
 	private process: ChildProcess;
 	private outputHandler: ((b: Buffer|string) => void)[];
 	
@@ -88,6 +88,16 @@ class TransitionHandler {
 	}
 }
 
+let globalLock: string = null;
+export function requireLock(lockId: string, spark: any) {
+	if (globalLock) {
+		throw new Error('jspm config has lock. must wait process finish.');
+	} else {
+		spark.globalLocked = true;
+		globalLock = lockId;
+	}
+}
+
 export function onConnection(spark) {
 	const handler = new TransitionHandler();
 	
@@ -100,14 +110,22 @@ export function onConnection(spark) {
 	});
 	
 	spark.on('end', () => {
-		handler.kill();
+		if (spark.globalLocked) {
+			globalLock = null;
+		}
+		handler.kill().catch();
 	});
 	spark.on('data', ({type, payload}) => {
 		if (type === 1) { // control
-			handleControlAction(handler, spark, payload).then(() => {
+			const lockId = Date.now().toFixed(0) + (Math.random() * 10000).toFixed(0);
+			handleControlAction(lockId, handler, spark, payload).then(() => {
 				spark.write('\x1B[38;5;10maction complete.\x1B[0m\n');
 			}, (err) => {
 				spark.write(`\x1B[38;5;9m${err.message}\x1B[0m\n`);
+			}).then(() => {
+				if (globalLock === lockId) {
+					globalLock = null;
+				}
 			});
 		} else { // I/O
 			handler.input(payload);
@@ -115,86 +133,26 @@ export function onConnection(spark) {
 	});
 }
 
-async function handleControlAction(handler: TransitionHandler, spark: any, payload: any) {
-	switch (payload.action) {
-	case 'resize':
-		return handleResize(handler, spark, payload.data);
-	case 'end':
-		return handler.finishInput();
-	case 'kill':
-		return handler.kill(payload.data);
-	case 'command':
-		return handleCommand(handler, spark, payload.data);
-	case 'function':
-		if (Array.isArray(payload.data)) {
-			const [func, ...args] = payload.data;
-			return handleFunction(handler, spark, func, args);
-		} else {
-			throw new Error(`unknown data: ${payload.data}`);
-		}
-	default:
-		throw new Error(`unknown action: ${payload.action}`);
+export function splitName(name) {
+	let [registry, base] = name.split(':');
+	if (!base) {
+		base = registry;
+		registry = 'jspm';
 	}
+	return [registry, base];
 }
 
-export type ISize = {cols: number, rows: number};
-function handleResize(handler: TransitionHandler, spark: any, data: ISize) {
-	
-}
-function handleCommand(handler: TransitionHandler, spark: any, data: string) {
-	handler.create(data.split(/\s+/)).catch();
-}
-async function handleFunction(handler: TransitionHandler, spark: any, fn: string, args: string[]) {
-	let success: boolean;
-	switch (fn) {
-	case 'install_inject':
-		success = await handler.create(['install', '-y', ...args]);
-		if (!success) {
-			return;
+export async function removeFile(spark: any, file: string) {
+	if (await fileExists(file)) {
+		try {
+			await unlink(file);
+			spark.write(`\x1B[38;5;14mremove ${file}.\x1B[0m\n`);
+		} catch (e) {
+			spark.write(`\x1B[38;5;9mremove ${file} failed: ${e.message}\x1B[0m\n`);
+			return false;
 		}
-		for (let name of args) {
-			let [registry, base] = name.split(':');
-			if (!base) {
-				base = registry;
-				registry = 'jspm';
-			}
-			await handler.create([
-				'bundle',
-				'-y',
-				'--skip-rollup',
-				'--minify',
-				'--inject',
-				'--no-mangle',
-				//'--format', 'cjs',
-				'--source-map-contents',
-				base,
-				`${getBundleLocation(base)}`,
-			]);
-			await handler.create([
-				'depcache',
-				base,
-			]);
-			
-			spark.write(`\x1B[38;5;14mremove ${getBundleTempLocation(base)}.\x1B[38;5;9m\n`);
-			if (await fileExists(base)) {
-				await unlink(getBundleTempLocation(base));
-			}
-		}
-		break;
-	case 'config_init':
-		await handler.create(['config', 'defaultTranspiler', 'false']);
-		await handler.create(['config', 'strictSSL', 'false']);
-		await handler.create(['config', 'registries.npm.registry', JsonEnv.gfw.npmRegistry.url]);
-		await handler.create(['config',
-			'registries.npm.auth',
-			base64(`${JsonEnv.gfw.npmRegistry.user}:${JsonEnv.gfw.npmRegistry.pass}`),
-		]);
-		await handler.create(['config', 'registries.github.auth', JsonEnv.gfw.github.credentials]);
-		const data = await readFile(process.env.HOME + '/.jspm/config');
-		spark.write(data);
-		break;
+	} else {
+		spark.write(`\x1B[2mremove ${file} - not exists.\x1B[0m\n`);
 	}
-}
-function base64(s: string): string {
-	return new Buffer(s).toString('base64')
+	return true;
 }

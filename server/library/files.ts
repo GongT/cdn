@@ -16,7 +16,7 @@ export async function initStorage() {
 	mkdirpSync(LOC_BUNDLE);
 	mkdirpSync(getTempFolder());
 	
-	const pkg = resolve(LOC_STORAGE, 'package.json');
+	const pkg = getPackageConfigFile();
 	if (!await fileExists(pkg)) {
 		await copy(resolve(LOC_TEMPL, 'package.json'), pkg);
 	}
@@ -35,12 +35,18 @@ export function getStorageBaseFolder() {
 export function getBundleLocation(library: string) {
 	return LOC_BUNDLE + library + '.js';
 }
+export function getBundleFileName(library: string) {
+	return 'bundles/' + library + '.js';
+}
 export function getBundleTempLocation(library: string) {
 	return LOC_TEMP + library + '.js';
 }
 
 export function getJspmConfigFile() {
 	return LOC_STORAGE + 'jspm.config.js';
+}
+export function getPackageConfigFile() {
+	return LOC_STORAGE + 'package.json';
 }
 
 export function getTempFolder() {

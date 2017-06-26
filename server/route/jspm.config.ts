@@ -73,6 +73,10 @@ export function generateJspmConfig() {
 	// lang=javascript
 	fileContent = `/* generated file */
 (function (System, Local, configData) {
+	if(!Array.prototype.forEach){
+		alert('your browser is too old.');
+		throw new Error('IE < 9');
+	}
 	var domain = ${s(rootUrl)};
 	if (/^\\/\\//.test(domain)) {
 		domain = location.protocol + domain;
@@ -80,7 +84,7 @@ export function generateJspmConfig() {
 	if (!/\\/$/.test(domain)) {
 		domain += '/';
 	}
-	var storageUrl = domain + 'storage';
+	var storageUrl = domain + 'storage/';
 	
 	if(configData.browserConfig) {
 		configData.browserConfig.baseURL = storageUrl;
@@ -137,9 +141,18 @@ export function generateJspmConfig() {
 			return {}; // no bundle with http2
 		}
 		
-		var ret = {};
+		var ret = {}, bundleList = [];
 		Object.keys(bundles).forEach((name) => {
-			ret[domain + 'load-' + name] = bundles[name];
+			bundleList.push({
+				length: bundles[name].length,
+				list: bundles[name],
+				name: domain + 'load-' + name
+			});
+		});
+		bundleList.sort(function (configA, configB){
+			return configA.length - configB.length;
+		}).forEach(function (config){
+			ret[config.name] = config.list;
 		});
 		return ret;
 	}

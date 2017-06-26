@@ -24,4 +24,10 @@ export class JspmCdnPlugin extends JspmPackagePlugin {
 		super.__modify_html(html, options);
 		html.script(this.remoteConfigUrl, 'jspm-config-cdn');
 	}
+	
+	public getHtmlResult() {
+		const data = super.getHtmlResult();
+		return `<script src="${this.remoteConfigUrl}" data-debug="jspm-config-cdn" type="text/javascript"></script>`
+		       + data;
+	}
 }
