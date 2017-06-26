@@ -1,6 +1,6 @@
-import {MicroBuildHelper} from "./.micro-build/x/microbuild-helper";
-import {MicroBuildConfig, ELabelNames, EPlugins} from "./.micro-build/x/microbuild-config";
 import {JsonEnv} from "./.jsonenv/_current_result";
+import {EPlugins, MicroBuildConfig} from "./.micro-build/x/microbuild-config";
+import {MicroBuildHelper} from "./.micro-build/x/microbuild-helper";
 declare const build: MicroBuildConfig;
 declare const helper: MicroBuildHelper;
 /*
@@ -44,6 +44,12 @@ build.addPlugin(EPlugins.typescript, {
 build.addPlugin(EPlugins.typescript, {
 	source: 'server/simple-package',
 	target: 'dist/simple-package',
+});
+build.addPlugin(EPlugins.jspm_bundle, {
+	build: false,
+	source: './dist/client-code/index.js',
+	packageJson: './package.json',
+	externals: ['@gongt/ts-stl-library', '@gongt/ts-stl-client'],
 });
 
 build.onConfig(() => {
