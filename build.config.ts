@@ -1,6 +1,6 @@
-import {JsonEnv} from "./.jsonenv/_current_result";
-import {EPlugins, MicroBuildConfig} from "./.micro-build/x/microbuild-config";
 import {MicroBuildHelper} from "./.micro-build/x/microbuild-helper";
+import {MicroBuildConfig, ELabelNames, EPlugins} from "./.micro-build/x/microbuild-config";
+import {JsonEnv} from "./.jsonenv/_current_result";
 declare const build: MicroBuildConfig;
 declare const helper: MicroBuildHelper;
 /*
@@ -54,7 +54,14 @@ build.addPlugin(EPlugins.jspm_bundle, {
 
 build.onConfig(() => {
 	const file = helper.createTextFile('export const PROJECT_NAME:string = ' + JSON.stringify(process.env.PROJECT_NAME));
-	file.save('server/simple-package/global.ts')
+	file.save('server/simple-package/global.ts');
+	
+	const fs = require('fs');
+	['package.json'].forEach((file) => {
+		const d = fs.readFileSync(`${__dirname}/server/simple-package/${file}`, 'utf8');
+		const f = helper.createTextFile(d);
+		f.save(`${__dirname}/dist/simple-package/${file}`);
+	});
 });
 
 build.volume('source-storage', '/data/source-storage');
