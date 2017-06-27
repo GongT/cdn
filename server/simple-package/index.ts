@@ -17,7 +17,7 @@ export class JspmCdnPlugin extends JspmPackagePlugin {
 	}
 	
 	public get systemJsUrl(): string {
-		return resolve(this.remoteBaseUrl, 'storage/jspm_packages/system.src.js');
+		return resolve(this.remoteBaseUrl, 'storage/jspm_packages/system.js');
 	}
 	
 	__modify_html(html: HtmlContainer, options: JspmHtmlConfig): void {
