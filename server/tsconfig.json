@@ -21,9 +21,6 @@
 		"baseUrl": "./",
 		"outDir": "../dist",
 		"rootDir": "./",
-		"paths": {
-			"@gongt/ts-stl-server": ["../node_modules/@gongt/ts-stl-server"],
-			"@gongt/ts-stl-library": ["../node_modules/@gongt/ts-stl-library"]
-		}
+		"paths": {}
 	}
 }

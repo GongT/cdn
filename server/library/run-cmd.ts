@@ -63,7 +63,7 @@ export async function tryRunJspm(context: DownloadRequestContext<any>,
 }
 
 const debug = createLogger(LOG_LEVEL.ERROR, 'process');
-export function killProcess(process: ChildProcess, SIGNAL: string = 'SIGHUP'): Promise<string> {
+export function killProcess(process: ChildProcess, SIGNAL: string = 'SIGHUP'): Promise<string|number> {
 	return new Promise((resolve, reject) => {
 		let to = setTimeout(() => {
 			to = null;

@@ -36,13 +36,13 @@ export function mountLoader(app: Application) {
 		}
 		
 		try {
-			let data = await readFile(file, 'utf8');
+			let data = await readFile(file, {encoding: 'utf8'});
 			
 			data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
 			data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
 			data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
 			
-			await writeFile(temp, data, 'utf8');
+			await writeFile(temp, data, {encoding: 'utf8'});
 			next();
 		} catch (e) {
 			return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
