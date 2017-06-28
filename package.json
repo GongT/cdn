@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@gongt/jenv-data": "latest",
 		"@gongt/ts-stl-server": "latest",
-		"child-process-promise": "git+ssh://git@github.com/GongT/child-process-promise.git",
+		"child-process-promise": "git://github.com/GongT/child-process-promise.git",
 		"ejs": "^2.5.6",
 		"express": "^4.15.3",
 		"extend": "^3.0.1",
