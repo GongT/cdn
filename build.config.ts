@@ -20,9 +20,10 @@ build.baseImage('node', 'alpine');
 build.projectName(projectName);
 build.domainName(projectName + '.' + JsonEnv.baseDomainName);
 
+build.forceLocalDns(true);
 build.isInChina(JsonEnv.gfw.isInChina, JsonEnv.gfw);
 build.npmCacheLayer(JsonEnv.gfw.npmRegistry);
-build.npmInstall('./package.json');
+build.npmInstall('./package.json', ['git', 'make', 'g++', 'python']);
 
 build.forwardPort(80, 'tcp');
 build.listenPort(3323);
