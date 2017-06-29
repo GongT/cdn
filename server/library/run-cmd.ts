@@ -3,10 +3,30 @@ import {createLogger} from "@gongt/ts-stl-server/debug";
 import {DownloadRequestContext} from "@gongt/ts-stl-server/express/raw-handler";
 import {LOG_LEVEL} from "@gongt/ts-stl-server/log/levels";
 import {ChildProcessResult, spawn} from "child-process-promise";
-import {ChildProcess, spawn as spawnNative} from "child_process";
+import {ChildProcess, spawn as spawnNative, spawnSync} from "child_process";
 import {getStorageBaseFolder} from "./files";
 
 const jspm = require.resolve('jspm').replace(/api\.js$/, 'jspm.js');
+if (!jspm) {
+	throw new Error('no jspm found.');
+}
+
+export function initRunJspm() {
+	const p = spawnSync(jspm, ['install', '--yes'], {
+		encoding: 'utf8',
+		cwd: getStorageBaseFolder(),
+		stdio: ['ignore', 'inherit', 'inherit'],
+	});
+	if (p.error) {
+		throw p.error;
+	}
+	if (p.status !== 0) {
+		throw new Error(`jspm init install exit with ${p.status}.`);
+	}
+	if (p.signal) {
+		throw new Error(`jspm init killed with ${p.signal}.`);
+	}
+}
 
 export function runJspm(...argument: string[]): Promise<{output: string}&ChildProcessResult<null>> {
 	const ret = spawn(jspm, argument, {

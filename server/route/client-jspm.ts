@@ -2,6 +2,9 @@ import {provideWithExpress} from "@gongt/ts-stl-server/express/middlewares/well-
 import {JspmPackagePlugin} from "@gongt/ts-stl-server/express/render/jspm";
 import {Application} from "express-serve-static-core";
 import {resolve} from "path";
+import {fileExists} from "../library/file-exists";
+import {getPackageConfigFile} from "../library/files";
+import {copySync} from "fs-extra";
 
 export const jspm = new JspmPackagePlugin({
 	packageName: 'client',

@@ -1,7 +1,8 @@
-import {copy, mkdirpSync} from "fs-extra";
+import {copySync, mkdirpSync} from "fs-extra";
 import {tmpdir} from "os";
 import {resolve} from "path";
-import {fileExists} from "./file-exists";
+import {fileExistsSync} from "./file-exists";
+import {initRunJspm} from "./run-cmd";
 
 const ROOT = resolve(__dirname, '../..') + '/';
 
@@ -9,17 +10,22 @@ const LOC_STORAGE = resolve(ROOT, 'source-storage') + '/';
 const LOC_BUNDLE = resolve(LOC_STORAGE, 'bundles') + '/';
 
 const LOC_TEMP = resolve(tmpdir(), 'jspm-cdn') + '/';
-const LOC_TEMPL = resolve(ROOT, 'public/template') + '/';
+export const LOC_TEMPL = resolve(ROOT, 'public/template') + '/';
 const LOC_VIEWS = resolve(ROOT, 'public/view') + '/';
 
-export async function initStorage() {
+export function initStorage() {
 	mkdirpSync(LOC_BUNDLE);
 	mkdirpSync(getTempFolder());
 	
 	const pkg = getPackageConfigFile();
-	if (!await fileExists(pkg)) {
-		await copy(resolve(LOC_TEMPL, 'package.json'), pkg);
+	if (!fileExistsSync(pkg)) {
+		copySync(resolve(LOC_TEMPL, 'package.json'), pkg);
 	}
+	
+	if (!fileExistsSync(getJspmConfigFile())) {
+		initRunJspm();
+	}
+	
 }
 
 export function getViewsFolder() {

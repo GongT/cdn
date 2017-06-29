@@ -1,4 +1,4 @@
-import {access} from "fs";
+import {access, accessSync} from "fs-extra";
 export function fileExists(path: string, mode?: number) {
 	return new Promise<any>((resolve, reject) => {
 		access(path, mode, (e) => {
@@ -9,4 +9,13 @@ export function fileExists(path: string, mode?: number) {
 			}
 		});
 	});
+}
+
+export function fileExistsSync(path: string, mode?: number) {
+	try {
+		accessSync(path, mode);
+		return true;
+	} catch (e) {
+		return false;
+	}
 }

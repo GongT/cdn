@@ -65,4 +65,4 @@ build.onConfig(() => {
 	});
 });
 
-build.volume('source-storage', '/data/source-storage');
+build.volume('./source-storage', '/data/source-storage');

@@ -37,6 +37,7 @@ builder.mountPublic('/storage/', getStorageBaseFolder(), {
 
 const app = builder.generateApplication();
 
+initStorage();
 initJspmConfig(app);
 mountBrowser(app);
 mountClient(app);
@@ -45,7 +46,6 @@ mountLoader(app);
 initDefaultDatabaseConnection(JsonEnv.DataBaseUrlTemplate.replace('%DATABASE-NAME%', 'cdn-source'));
 
 const final = Promise.all([
-	initStorage(),
 	waitDatabaseToConnect(),
 ]).then(() => {
 	return bootExpressApp(app);

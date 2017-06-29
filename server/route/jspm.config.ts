@@ -57,8 +57,12 @@ export function generateJspmConfig() {
 	let config = loadSystemjsConfigFile(file);
 	
 	delete config.paths;
-	delete config.browserConfig.paths;
-	delete config.packages['jspm-cdn'];
+	if (config.browserConfig) {
+		delete config.browserConfig.paths;
+	}
+	if (config.packages) {
+		delete config.packages['jspm-cdn'];
+	}
 	
 	delete config.nodeConfig;
 	delete config.devConfig;
