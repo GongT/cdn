@@ -1,6 +1,6 @@
-import {MicroBuildHelper} from "./.micro-build/x/microbuild-helper";
-import {MicroBuildConfig, ELabelNames, EPlugins} from "./.micro-build/x/microbuild-config";
 import {JsonEnv} from "./.jsonenv/_current_result";
+import {EPlugins, MicroBuildConfig} from "./.micro-build/x/microbuild-config";
+import {MicroBuildHelper} from "./.micro-build/x/microbuild-helper";
 declare const build: MicroBuildConfig;
 declare const helper: MicroBuildHelper;
 /*
@@ -23,7 +23,8 @@ build.domainName(projectName + '.' + JsonEnv.baseDomainName);
 build.forceLocalDns(true);
 build.isInChina(JsonEnv.gfw.isInChina, JsonEnv.gfw);
 build.npmCacheLayer(JsonEnv.gfw.npmRegistry);
-build.npmInstall('./package.json', ['git', 'make', 'g++', 'python']);
+build.systemInstall('git');
+build.npmInstall('./package.json', ['make', 'g++', 'python']);
 
 build.forwardPort(80, 'tcp');
 build.listenPort(3323);
