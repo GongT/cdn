@@ -23,9 +23,12 @@ export function initStorage() {
 	}
 	
 	if (!fileExistsSync(getJspmConfigFile())) {
-		initRunJspm();
+		initRunJspm('install', '--yes');
 	}
 	
+	if (!fileExistsSync(LOC_STORAGE + 'jspm_packages/system.js')) {
+		initRunJspm('dl-loader');
+	}
 }
 
 export function getViewsFolder() {

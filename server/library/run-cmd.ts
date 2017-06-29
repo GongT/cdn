@@ -11,8 +11,8 @@ if (!jspm) {
 	throw new Error('no jspm found.');
 }
 
-export function initRunJspm() {
-	const p = spawnSync(jspm, ['install', '--yes'], {
+export function initRunJspm(...cmds:string[]) {
+	const p = spawnSync(jspm, cmds, {
 		encoding: 'utf8',
 		cwd: getStorageBaseFolder(),
 		stdio: ['ignore', 'inherit', 'inherit'],
