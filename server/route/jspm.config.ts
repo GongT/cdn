@@ -141,9 +141,9 @@ export function generateJspmConfig() {
 			return {};
 		}
 		
-		if(http2support()) {
-			return {}; // no bundle with http2
-		}
+		// if(http2support()) {
+		// 	return {}; // no bundle with http2
+		// }
 		
 		var ret = {}, bundleList = [];
 		Object.keys(bundles).forEach((name) => {
