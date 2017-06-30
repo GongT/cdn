@@ -1,6 +1,7 @@
 import {getBundleLocation, getBundleTempLocation} from "../library/files";
 import {generateJspmConfig} from "../route/jspm.config";
 import {createOpList} from "./cleanup.function";
+import {createDepCache} from "./jspm-functions";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export async function jspmBundleCache(name: string, opList: string[], handler: TransitionHandler) {
@@ -18,13 +19,9 @@ export async function jspmBundleCache(name: string, opList: string[], handler: T
 		...opList,
 		`${getBundleLocation(base)}`,
 	]);
-	await handler.create([
-		'depcache',
-		base,
-	]);
 }
 
-export async function handleInstall(handler: TransitionHandler, spark: any, fn: string, args: string[]) {
+export async function handleInstall(handler: TransitionHandler, spark: any, args: string[]) {
 	let success: boolean;
 	success = await handler.create(['install', '-y', ...args]);
 	if (!success) {
@@ -52,6 +49,8 @@ export async function handleInstall(handler: TransitionHandler, spark: any, fn: 
 		
 		await removeFile(spark, getBundleTempLocation(base));
 	}
+	
+	await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
 	generateJspmConfig();

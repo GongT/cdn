@@ -38,6 +38,7 @@ const indexMainBody = `
 		<option value="install_inject">下载并打包</option>
 		<option value="uninstall">删除</option>
 		<option value="update_cache">更新jspm.config.js缓存</option>
+		<option value="update_dep_cache">生成depcache</option>
 		<option value="cleanup_bundles">清理生成文件</option>
 		<option value="config_init">初始化配置文件</option>
 	</select>

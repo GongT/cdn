@@ -1,7 +1,7 @@
 import {readFile} from "fs-extra";
 import {TransitionHandler} from "provider/socket-handler";
 
-export async function handleConfigInit(handler: TransitionHandler, spark: any, fn: string, args: string[]) {
+export async function handleConfigInit(handler: TransitionHandler, spark: any, args: string[]) {
 	await handler.create(['config', 'defaultTranspiler', 'false']);
 	await handler.create(['config', 'strictSSL', 'false']);
 	await handler.create(['config', 'registries.npm.registry', JsonEnv.gfw.npmRegistry.url]);

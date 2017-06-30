@@ -42,7 +42,7 @@ export function createOpList(name: string): string[] {
 	});
 	return opList;
 }
-export async function handleCleanup(handler: TransitionHandler, spark: any, fn: string, args: string[]) {
+export async function handleCleanup(handler: TransitionHandler, spark: any, args: string[]) {
 	const list = args.length? args : getDependencies();
 	
 	spark.write(`bundles all:\n ::  ${list.join('\n ::  ')}\n`);

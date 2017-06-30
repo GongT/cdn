@@ -1,8 +1,9 @@
-import {ModuleFileMapping, SystemjsConfigFile} from "@gongt/ts-stl-client/jspm/defines";
+import {SystemjsConfigFile} from "@gongt/ts-stl-client/jspm/defines";
 import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
 import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm.write";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {generateJspmConfig} from "../route/jspm.config";
+import {createDepCache} from "./jspm-functions";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export function findFullFormat(configs: SystemjsConfigFile[], packageBase: string) {
@@ -26,33 +27,6 @@ export function findFullFormat(configs: SystemjsConfigFile[], packageBase: strin
 	return ret;
 }
 
-function removeDepCache(spark: any, configs: SystemjsConfigFile[], packageBase: string) {
-	const fullPackageName = findFullFormat(configs, packageBase);
-	if (!fullPackageName) {
-		return;
-	}
-	
-	const remove = (depCache: ModuleFileMapping) => {
-		for (let i in depCache) {
-			if (!depCache.hasOwnProperty(i)) {
-				continue;
-			}
-			if (i.indexOf(fullPackageName) === 0) {
-				spark.write(`remove depCache: ${i}\n`);
-				delete depCache[i];
-			}
-		}
-	};
-	configs.forEach((conf) => {
-		if (conf.depCache) {
-			remove(conf.depCache)
-		}
-		if (conf.browserConfig.depCache) {
-			remove(conf.browserConfig.depCache)
-		}
-	});
-}
-
 function removeBundles(spark: any, configs: SystemjsConfigFile[], packageBase: string) {
 	const bundleFile = getBundleFileName(packageBase);
 	configs.forEach((config) => {
@@ -67,7 +41,7 @@ function removeBundles(spark: any, configs: SystemjsConfigFile[], packageBase: s
 	});
 }
 
-export async function handleUninstall(handler: TransitionHandler, spark: any, fn: string, args: string[]) {
+export async function handleUninstall(handler: TransitionHandler, spark: any, args: string[]) {
 	let success: boolean;
 	const bases = args.map((name) => {
 		const [registry, base] = splitName(name);
@@ -89,6 +63,8 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, fn
 	
 	spark.write(`save jspm.config.js real content\n`);
 	await saveSystemjsConfigFileMultiParts(getJspmConfigFile(), configs);
+	
+	await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
 	generateJspmConfig();

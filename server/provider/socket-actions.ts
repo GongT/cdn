@@ -5,7 +5,7 @@ import {handleInstall} from "./install.function";
 import {handleResize} from "./resize.action";
 import {requireLock, TransitionHandler} from "./socket-handler";
 import {handleUninstall} from "./uninstall.function";
-import {handleUpdateJspmConfigCache} from "./update-cache.function";
+import {handleUpdateJspmConfigCache, handleUpdateJspmDepCache} from "./update-cache.function";
 
 export async function handleControlAction(lockId: string, handler: TransitionHandler, spark: any, payload: any) {
 	switch (payload.action) {
@@ -34,15 +34,17 @@ async function handleFunction(lockId: string, handler: TransitionHandler, spark:
 	switch (fn) {
 	case 'install_inject':
 		requireLock(lockId, spark);
-		return handleInstall(handler, spark, fn, args);
+		return handleInstall(handler, spark, args);
 	case 'uninstall':
 		requireLock(lockId, spark);
-		return handleUninstall(handler, spark, fn, args);
+		return handleUninstall(handler, spark, args);
 	case 'config_init':
-		return handleConfigInit(handler, spark, fn, args);
+		return handleConfigInit(handler, spark, args);
 	case 'update_cache':
-		return handleUpdateJspmConfigCache(handler, spark, fn);
+		return handleUpdateJspmConfigCache(handler, spark);
+	case 'update_dep_cache':
+		return handleUpdateJspmDepCache(handler, spark);
 	case 'cleanup_bundles':
-		return handleCleanup(handler, spark, fn, args);
+		return handleCleanup(handler, spark, args);
 	}
 }
