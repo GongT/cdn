@@ -7,5 +7,5 @@ export function getBaseUrl() {
 	if (!/\/$/.test(base)) {
 		base += '/';
 	}
-	return base;
+	return base.replace(/^https?:/, '');
 }
