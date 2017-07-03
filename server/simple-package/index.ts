@@ -1,11 +1,19 @@
 import {HtmlContainer} from "@gongt/ts-stl-server/express/middlewares/html-render";
-import {JspmHtmlConfig, JspmPackagePlugin} from "@gongt/ts-stl-server/express/render/jspm";
+import {JspmConstructOptions, JspmHtmlConfig, JspmPackagePlugin} from "@gongt/ts-stl-server/express/render/jspm";
 import {resolve} from "url";
 import {getBaseUrl} from "./get-base";
 
 export class JspmCdnPlugin extends JspmPackagePlugin {
-	public get remoteBaseUrl(): string {
-		return getBaseUrl();
+	protected remoteBaseUrl: string;
+	
+	constructor(options?: Partial<{baseUrl: string}&JspmConstructOptions>) {
+		super(options);
+		if (options) {
+			this.remoteBaseUrl = options.baseUrl;
+		}
+		if (!this.remoteBaseUrl) {
+			this.remoteBaseUrl = getBaseUrl();
+		}
 	}
 	
 	public get remotePackageUrl() {

@@ -55,7 +55,7 @@ build.addPlugin(EPlugins.jspm_bundle, {
 });
 
 build.onConfig(() => {
-	const file = helper.createTextFile('export const PROJECT_NAME:string = ' + JSON.stringify(process.env.PROJECT_NAME));
+	const file = helper.createTextFile('export const PROJECT_NAME:string = ' + JSON.stringify(projectName));
 	file.save('server/simple-package/global.ts');
 	
 	const fs = require('fs');
