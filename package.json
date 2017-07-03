@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "microbuild build",
 		"service": "microbuild control",
-		"prepublishOnly": "cd dist/simple-package && npm publish --access=public"
+		"prepublishOnly": "sh prepare-publish.sh && cd dist/simple-package && npm publish --access=public"
 	},
 	"repository": {
 		"type": "git",
