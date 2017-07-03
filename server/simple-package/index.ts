@@ -35,7 +35,7 @@ export class JspmCdnPlugin extends JspmPackagePlugin {
 	
 	public getHtmlResult() {
 		const data = super.getHtmlResult();
-		return `<script src="${this.remoteConfigUrl}" data-debug="jspm-config-cdn" type="text/javascript"></script>`
+		return `<script crossorigin="anonymous" src="${this.remoteConfigUrl}" data-debug="jspm-config-cdn" type="text/javascript"></script>`
 		       + data;
 	}
 }
