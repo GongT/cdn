@@ -1,6 +1,6 @@
 {
 	"name": "@gongt/jspm",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
@@ -17,8 +17,8 @@
 	"homepage": "https://github.com/GongT/jspm-cdn#readme",
 	"private": false,
 	"dependencies": {
-		"@gongt/ts-stl-server": "latest",
-		"@gongt/jenv-data": "latest"
+		"@gongt/ts-stl-server": "^1.2.9",
+		"@gongt/jenv-data": "^1.2.6"
 	},
 	"devDependencies": {
 	}
