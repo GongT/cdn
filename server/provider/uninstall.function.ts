@@ -17,7 +17,8 @@ export function findFullFormat(configs: SystemjsConfigFile[], packageBase: strin
 			ret = <string>config.map[packageBase];
 			return true;
 		}
-		if (config.browserConfig.map &&
+		if (config.browserConfig &&
+		    config.browserConfig.map &&
 		    config.browserConfig.map[packageBase] &&
 		    (typeof config.browserConfig.map[packageBase] === 'string')
 		) {
