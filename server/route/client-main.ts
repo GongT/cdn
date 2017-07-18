@@ -42,6 +42,7 @@ const indexMainBody = `
 		<option value="update_dep_cache">生成depcache</option>
 		<option value="cleanup_bundles">清理生成文件</option>
 		<option value="config_init">初始化配置文件</option>
+		<option value="installed_show">显示所有已注册包</option>
 	</select>
 	<input id="funcargs" class="grow" type="text" style="flex-grow:1" autocomplete="off" placeholder="参数">
 	<input id="funcbutton" type="button" value="RUN">

@@ -2,6 +2,7 @@ import {installedPackages} from "../library/local-package-list";
 import {handleCleanup} from "./cleanup.function";
 import {handleCommand} from "./command.function";
 import {handleConfigInit} from "./config-init.function";
+import {handleDisplayAll} from "./display-all.function";
 import {handleInstall, handleInstallOnly} from "./install.function";
 import {handleResize} from "./resize.action";
 import {requireLock, TransitionHandler} from "./socket-handler";
@@ -50,5 +51,7 @@ async function handleFunction(lockId: string, handler: TransitionHandler, spark:
 		return handleUpdateJspmDepCache(handler, spark);
 	case 'cleanup_bundles':
 		return handleCleanup(handler, spark, args);
+	case 'installed_show':
+		return handleDisplayAll(handler, spark);
 	}
 }
