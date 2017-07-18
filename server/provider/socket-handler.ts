@@ -121,7 +121,7 @@ export function onConnection(spark) {
 			handleControlAction(lockId, handler, spark, payload).then(() => {
 				spark.write('\x1B[38;5;10maction complete.\x1B[0m\n');
 			}, (err) => {
-				spark.write(`\x1B[38;5;9m${err.message}\x1B[0m\n`);
+				spark.write(`\x1B[38;5;9m${err.stack || err.message}\x1B[0m\n`);
 			}).then(() => {
 				if (globalLock === lockId) {
 					globalLock = null;
