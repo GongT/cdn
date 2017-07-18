@@ -2,6 +2,7 @@ import {SystemjsConfigFile} from "@gongt/ts-stl-client/jspm/defines";
 import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
 import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm.write";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
+import {removeInstalledPackage} from "../library/local-package-list";
 import {generateJspmConfig} from "../route/jspm.config";
 import {createDepCache} from "./jspm-functions";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
@@ -53,6 +54,7 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, ar
 	if (!success) {
 		throw new Error('unable to uninstall.');
 	}
+	removeInstalledPackage(args);
 	
 	for (let base of bases) {
 		removeBundles(spark, configs, base);

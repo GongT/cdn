@@ -4,6 +4,7 @@ import {generateJspmConfig} from "../route/jspm.config";
 import {jspmBundleCache} from "./install.function";
 import {splitName, TransitionHandler} from "./socket-handler";
 import {findFullFormat} from "./uninstall.function";
+import {installedPackages} from "../library/local-package-list";
 
 let timer, cache: string[];
 export function getDependencies(): string[] {
@@ -27,7 +28,7 @@ export function createOpList(name: string): string[] {
 	
 	const configs = loadSystemjsConfigFileMultiParts(getJspmConfigFile());
 	
-	getDependencies().forEach((name) => {
+	installedPackages().forEach((name) => {
 		if (name === base) {
 			return;
 		}
@@ -43,7 +44,7 @@ export function createOpList(name: string): string[] {
 	return opList;
 }
 export async function handleCleanup(handler: TransitionHandler, spark: any, args: string[]) {
-	const list = args.length? args : getDependencies();
+	const list = args.length? args : installedPackages();
 	
 	spark.write(`bundles all:\n ::  ${list.join('\n ::  ')}\n`);
 	const argsOpList = list.map((name) => {

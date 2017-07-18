@@ -1,13 +1,14 @@
 import {writeFile} from "fs-extra";
 import {resolve} from "path";
 import {getStorageBaseFolder} from "../library/files";
-import {getDependencies} from "./cleanup.function";
-import {TransitionHandler} from "./socket-handler";
+import {installedPackages} from "../library/local-package-list";
+import {splitName, TransitionHandler} from "./socket-handler";
 
 export async function createDepCache(handler: TransitionHandler, spark: any,) {
 	let loadAllDeps = '';
-	getDependencies().forEach((name) => {
-		loadAllDeps += `import ${JSON.stringify(name)}\n`;
+	installedPackages().forEach((name) => {
+		const [registry, base] = splitName(name);
+		loadAllDeps += `import ${JSON.stringify(base)}\n`;
 	});
 	
 	spark.write(`create dep-cache\n`);

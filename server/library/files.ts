@@ -1,3 +1,4 @@
+import {TextFile} from "@gongt/ts-stl-server/file-operation/text-file";
 import {copySync, mkdirpSync} from "fs-extra";
 import {tmpdir} from "os";
 import {resolve} from "path";
@@ -49,6 +50,9 @@ export function getBundleFileName(library: string) {
 }
 export function getBundleTempLocation(library: string) {
 	return LOC_TEMP + library + '.js';
+}
+export function getLocalPackageList() {
+	return new TextFile(LOC_STORAGE + 'package-list.txt', 'utf8', true);
 }
 
 export function getJspmConfigFile() {

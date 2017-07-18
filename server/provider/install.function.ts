@@ -1,4 +1,5 @@
 import {getBundleLocation, getBundleTempLocation} from "../library/files";
+import {mergeInstalledPackage} from "../library/local-package-list";
 import {generateJspmConfig} from "../route/jspm.config";
 import {createOpList} from "./cleanup.function";
 import {createDepCache} from "./jspm-functions";
@@ -27,6 +28,8 @@ export async function handleInstall(handler: TransitionHandler, spark: any, args
 	if (!success) {
 		return;
 	}
+	
+	mergeInstalledPackage(args);
 	
 	args = args.filter((n, i) => {
 		return args.indexOf(n) === i;
