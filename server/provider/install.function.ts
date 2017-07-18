@@ -22,6 +22,13 @@ export async function jspmBundleCache(name: string, opList: string[], handler: T
 	]);
 }
 
+export async function handleInstallOnly(handler: TransitionHandler, spark: any, args: string[]) {
+	await handler.create(['install', '-y', ...args]);
+	
+	spark.write(`update jspm.config.js cache content\n`);
+	generateJspmConfig();
+}
+
 export async function handleInstall(handler: TransitionHandler, spark: any, args: string[]) {
 	let success: boolean;
 	success = await handler.create(['install', '-y', ...args]);

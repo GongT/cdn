@@ -36,6 +36,7 @@ const indexMainBody = `
 	<select id="funcname">
 		<option value="" selected> -- </option>
 		<option value="install_inject">下载并打包</option>
+		<option value="install_everything">下载全部依赖</option>
 		<option value="uninstall">删除</option>
 		<option value="update_cache">更新jspm.config.js缓存</option>
 		<option value="update_dep_cache">生成depcache</option>

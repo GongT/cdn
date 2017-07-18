@@ -1,7 +1,8 @@
+import {installedPackages} from "../library/local-package-list";
 import {handleCleanup} from "./cleanup.function";
 import {handleCommand} from "./command.function";
 import {handleConfigInit} from "./config-init.function";
-import {handleInstall} from "./install.function";
+import {handleInstall, handleInstallOnly} from "./install.function";
 import {handleResize} from "./resize.action";
 import {requireLock, TransitionHandler} from "./socket-handler";
 import {handleUninstall} from "./uninstall.function";
@@ -35,6 +36,9 @@ async function handleFunction(lockId: string, handler: TransitionHandler, spark:
 	case 'install_inject':
 		requireLock(lockId, spark);
 		return handleInstall(handler, spark, args);
+	case 'install_everything':
+		requireLock(lockId, spark);
+		return handleInstallOnly(handler, spark, installedPackages());
 	case 'uninstall':
 		requireLock(lockId, spark);
 		return handleUninstall(handler, spark, args);
