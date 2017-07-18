@@ -20,5 +20,5 @@ export function removeInstalledPackage(packages: string[]) {
 }
 
 export function installedPackages(): string[] {
-	return listFile.content.splice();
+	return listFile.content.slice();
 }
