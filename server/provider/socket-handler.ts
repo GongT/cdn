@@ -139,7 +139,13 @@ export function splitName(name) {
 		base = registry;
 		registry = 'jspm';
 	}
-	return [registry, base];
+	if (base.lastIndexOf('@') > 0) {
+		const arr = name.split('@');
+		const version = arr.pop();
+		return [registry, arr.join('@'), version];
+	} else {
+		return [registry, base];
+	}
 }
 
 export async function removeFile(spark: any, file: string) {
