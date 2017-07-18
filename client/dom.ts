@@ -26,6 +26,7 @@ funcButton.addEventListener('click', () => {
 		return;
 	}
 	
+	console.log('try run function: ', funcName.value, funcArgs.value);
 	Connection.emit('function', [funcName.value, funcArgs.value]);
 });
 

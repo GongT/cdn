@@ -22,8 +22,8 @@ export async function handleControlAction(lockId: string, handler: TransitionHan
 		return handleCommand(handler, spark, payload.data);
 	case 'function':
 		if (Array.isArray(payload.data)) {
-			const [func, ...args] = payload.data;
-			return handleFunction(lockId, handler, spark, func, args.filter(e => !!e));
+			const [func, args] = payload.data;
+			return handleFunction(lockId, handler, spark, func, args.split(/\s+/).filter(e => !!e));
 		} else {
 			throw new Error(`unknown data: ${payload.data}`);
 		}
