@@ -2,7 +2,8 @@ import {HTTP} from "@gongt/ts-stl-library/request/request";
 import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
 import {Router} from "express";
 import {Application} from "express-serve-static-core";
-import {readFile, writeFile} from "fs-extra";
+import {mkdirp, readFile, writeFile} from "fs-extra";
+import {dirname} from "path";
 import * as serveStataic from "serve-static";
 import {fileExists} from "../library/file-exists";
 import {getBundleLocation, getBundleTempLocation, getJspmConfigFile, getTempFolder} from "../library/files";
@@ -24,11 +25,15 @@ export function mountLoader(app: Application) {
 	
 	const router = Router();
 	app.use('/load-bundles', router);
-	router.get('/:file', serveStataic(getTempFolder()), async function (req, res, next) {
-		if (!req.params.file) {
+	router.get(['/:file', '/:scope/:package'], serveStataic(getTempFolder()), async function (req, res, next) {
+		let name;
+		if (req.params.scope && req.params.package) {
+			name = req.params.scope + '/' + req.params.package.replace(/\.js$/, '');
+		} else if (req.params.file) {
+			name = req.params.file.replace(/\.js$/, '');
+		} else {
 			return res.status(HTTP.BAD_REQUEST).send('');
 		}
-		const name = req.params.file.replace(/\.js$/, '');
 		const file = getBundleLocation(name);
 		const temp = getBundleTempLocation(name);
 		if (!fileExists(file)) {
@@ -36,6 +41,8 @@ export function mountLoader(app: Application) {
 		}
 		
 		try {
+			await mkdirp(dirname(temp));
+			
 			let data = await readFile(file, {encoding: 'utf8'});
 			
 			data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');

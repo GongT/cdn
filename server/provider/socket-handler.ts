@@ -139,8 +139,8 @@ export function splitName(name) {
 		base = registry;
 		registry = 'jspm';
 	}
-	if (base.lastIndexOf('@') > 0) {
-		const arr = name.split('@');
+	if (base.lastIndexOf('@') > 0) { // has version
+		const arr = base.split('@');
 		const version = arr.pop();
 		return [registry, arr.join('@'), version];
 	} else {
