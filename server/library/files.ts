@@ -1,4 +1,6 @@
+import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
 import {TextFile} from "@gongt/ts-stl-server/file-operation/text-file";
+import {writeFileSync} from "fs";
 import {copySync, mkdirpSync} from "fs-extra";
 import {tmpdir} from "os";
 import {resolve} from "path";
@@ -29,6 +31,23 @@ export function initStorage() {
 	
 	if (!fileExistsSync(LOC_STORAGE + 'jspm_packages/system.js')) {
 		initRunJspm('dl-loader');
+	}
+	
+	const file = getJspmConfigFile();
+	const configs = loadSystemjsConfigFileMultiParts(file);
+	let changed = false;
+	for (const config of configs) {
+		if (config.paths) {
+			if (!config.paths["npm:@*"]) {
+				config.paths["npm:@*"] = "jspm_packages/npm/@*";
+				changed = true;
+			}
+		}
+	}
+	if (changed) {
+		writeFileSync(file, configs.map((config) => {
+			return `SystemJS.config(${JSON.stringify(config, null, 2)});`;
+		}).join('\n\n'));
 	}
 }
 
