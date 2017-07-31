@@ -11,10 +11,12 @@ const debug = createLogger(LOG_LEVEL.ERROR, 'socket');
 export class TransitionHandler {
 	private process: ChildProcess;
 	private outputHandler: ((b: Buffer|string) => void)[];
+	public lastOutput: string;
 	
 	constructor() {
 		this.onOutput = this.onOutput.bind(this);
 		this.onEnd = this.onEnd.bind(this);
+		this.catchOut = this.catchOut.bind(this);
 		this.outputHandler = [];
 	}
 	
@@ -30,6 +32,10 @@ export class TransitionHandler {
 		});
 	}
 	
+	private catchOut(data: Buffer|string) {
+		this.lastOutput += (data instanceof Buffer)? data.toString('utf8') : data;
+	}
+	
 	private onEnd(code: number, signal: string) {
 		if (signal) {
 			this.print(`\x1B[38;5;9mprocess exited, killed by signal ${signal}.\x1B[0m`);
@@ -41,7 +47,7 @@ export class TransitionHandler {
 		this.process = null;
 	}
 	
-	create(commandline: string[]): Promise<boolean> {
+	create(commandline: string[], catchOut: boolean = false): Promise<boolean> {
 		if (this.process) {
 			debug('create process: already started: %s', commandline);
 			this.print('\x1B[38;5;9mprocess is already started.\x1B[0m');
@@ -52,6 +58,12 @@ export class TransitionHandler {
 		this.process = forkJspm(...commandline);
 		this.process.stdout.on('data', this.onOutput);
 		this.process.stderr.on('data', this.onOutput);
+		if (catchOut) {
+			this.lastOutput = '';
+			this.process.stdout.on('data', this.catchOut);
+		} else {
+			this.lastOutput = null;
+		}
 		this.process.on('exit', this.onEnd);
 		
 		return new Promise((resolve) => {
