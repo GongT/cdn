@@ -1,7 +1,6 @@
-import {pathExistsSync, readFile} from "fs-extra";
-import {fileExistsSync} from "../library/file-exists";
 import {getBundleLocation, getBundleTempLocation} from "../library/files";
 import {mergeInstalledPackage} from "../library/local-package-list";
+import {resolvePackageCmdItem} from "../library/package-name";
 import {generateJspmConfig} from "../route/jspm.config";
 import {createOpList} from "./cleanup.function";
 import {createDepCache} from "./jspm-functions";
@@ -9,19 +8,7 @@ import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export async function jspmBundleCache(name: string, opList: string[], handler: TransitionHandler) {
 	const [registry, base] = splitName(name);
-	
-	let packageIndex = base;
-	await handler.create([
-		'normalize',
-		base,
-	], true);
-	const path = handler.lastOutput.trim().replace(/^file:\/\//, '');
-	if (pathExistsSync(path) && fileExistsSync(path + '.json')) {
-		const pkg = JSON.parse(await readFile(path + '.json', {encoding: 'utf8'}));
-		if (!pkg.main) {
-			packageIndex = `[${base}/**/*.js]`;
-		}
-	}
+	const packageIndex = await resolvePackageCmdItem(name, handler);
 	
 	await handler.create([
 		'bundle',

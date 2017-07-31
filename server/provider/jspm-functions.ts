@@ -2,14 +2,17 @@ import {writeFile} from "fs-extra";
 import {resolve} from "path";
 import {getStorageBaseFolder} from "../library/files";
 import {installedPackages} from "../library/local-package-list";
+import {packageHasMainIndex} from "../library/package-name";
 import {splitName, TransitionHandler} from "./socket-handler";
 
 export async function createDepCache(handler: TransitionHandler, spark: any,) {
 	let loadAllDeps = '';
-	installedPackages().forEach((name) => {
+	for (const name of installedPackages()) {
 		const [registry, base] = splitName(name);
-		loadAllDeps += `import ${JSON.stringify(base)}\n`;
-	});
+		if (await packageHasMainIndex(name, handler)) {
+			loadAllDeps += `import ${JSON.stringify(base)}\n`;
+		}
+	}
 	
 	spark.write(`create dep-cache\n`);
 	const tokenFile = resolve(getStorageBaseFolder(), 'try-load-all-libs.js');
