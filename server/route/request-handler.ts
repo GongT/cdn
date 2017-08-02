@@ -23,6 +23,6 @@ handler.setHandler(async (context) => {
 	
 	console.log('----------------', library, loc);
 	
-	const result = await tryRunJspm(context, 'install', '-y', registry + ':' + library);
+	const result = await tryRunJspm(context, 'install', registry + ':' + library);
 	
 });

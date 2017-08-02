@@ -51,7 +51,7 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, ar
 	});
 	const configs = loadSystemjsConfigFileMultiParts(getJspmConfigFile());
 	
-	success = await handler.create(['uninstall', '-y', ...bases]);
+	success = await handler.create(['uninstall', ...bases]);
 	if (!success) {
 		throw new Error('unable to uninstall.');
 	}

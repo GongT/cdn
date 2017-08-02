@@ -12,7 +12,6 @@ export async function jspmBundleCache(name: string, opList: string[], handler: T
 	
 	await handler.create([
 		'bundle',
-		'-y',
 		// '--skip-rollup',
 		'--minify',
 		'--inject',
@@ -26,7 +25,7 @@ export async function jspmBundleCache(name: string, opList: string[], handler: T
 }
 
 export async function handleInstallOnly(handler: TransitionHandler, spark: any, args: string[]) {
-	await handler.create(['install', '-y', ...args]);
+	await handler.create(['install', ...args]);
 	
 	spark.write(`update jspm.config.js cache content\n`);
 	generateJspmConfig();
@@ -34,7 +33,7 @@ export async function handleInstallOnly(handler: TransitionHandler, spark: any, 
 
 export async function handleInstall(handler: TransitionHandler, spark: any, args: string[]) {
 	let success: boolean;
-	success = await handler.create(['install', '-y', ...args]);
+	success = await handler.create(['install', ...args]);
 	if (!success) {
 		return;
 	}
