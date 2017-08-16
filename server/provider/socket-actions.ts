@@ -7,7 +7,7 @@ import {handleInstall, handleInstallOnly} from "./install.function";
 import {handleResize} from "./resize.action";
 import {requireLock, TransitionHandler} from "./socket-handler";
 import {handleUninstall} from "./uninstall.function";
-import {handleUpdateJspmConfigCache, handleUpdateJspmDepCache} from "./update-cache.function";
+import {handleRemoveJspmDepCache, handleUpdateJspmConfigCache, handleUpdateJspmDepCache} from "./update-cache.function";
 
 export async function handleControlAction(lockId: string, handler: TransitionHandler, spark: any, payload: any) {
 	switch (payload.action) {
@@ -49,6 +49,8 @@ async function handleFunction(lockId: string, handler: TransitionHandler, spark:
 		return handleUpdateJspmConfigCache(handler, spark);
 	case 'update_dep_cache':
 		return handleUpdateJspmDepCache(handler, spark);
+	case 'remove_dep_cache':
+		return handleRemoveJspmDepCache(handler, spark);
 	case 'cleanup_bundles':
 		return handleCleanup(handler, spark, args);
 	case 'installed_show':

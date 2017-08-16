@@ -67,9 +67,9 @@ export function mountLoader(app: Application) {
 				
 				let data = await readFile(file, {encoding: 'utf8'});
 				
-				data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
-				data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
-				data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
+				// data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
+				// data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
+				// data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
 				
 				await writeFile(temp, data, {encoding: 'utf8'});
 				next();
@@ -98,9 +98,9 @@ export function generateJspmConfig() {
 	delete config.devConfig;
 	
 	let text = JSON.stringify(config, null, 2);
-	text = text.replace(/"npm:/g, '"jspmcdn-npm:');
-	text = text.replace(/"github:/g, '"jspmcdn-github:');
-	text = text.replace(/"jspm:/g, '"jspmcdn-jspm:');
+	// text = text.replace(/"npm:/g, '"jspmcdn-npm:');
+	// text = text.replace(/"github:/g, '"jspmcdn-github:');
+	// text = text.replace(/"jspm:/g, '"jspmcdn-jspm:');
 	
 	config = JSON.parse(text); // confirm
 	
@@ -192,9 +192,9 @@ export function generateJspmConfig() {
 	}
 	
 	configData.paths = {
-		'jspmcdn-npm:': storageUrl + 'jspm_packages/npm/',
-		'jspmcdn-github:': storageUrl + 'jspm_packages/github/',
-		'jspmcdn-jspm:': storageUrl + 'jspm_packages/jspm/',
+		'npm:': storageUrl + 'jspm_packages/npm/',
+		'github:': storageUrl + 'jspm_packages/github/',
+		'jspm:': storageUrl + 'jspm_packages/jspm/',
 	};
 	
 	Local.config(configData);
