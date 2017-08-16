@@ -54,9 +54,11 @@ export function initStorage() {
 export function getViewsFolder() {
 	return LOC_VIEWS;
 }
+
 export function getBundleFolder() {
 	return LOC_BUNDLE;
 }
+
 export function getStorageBaseFolder() {
 	return LOC_STORAGE;
 }
@@ -64,12 +66,23 @@ export function getStorageBaseFolder() {
 export function getBundleLocation(library: string) {
 	return LOC_BUNDLE + library + '.js';
 }
+
+export function getBundleMapLocation(library: string) {
+	return LOC_BUNDLE + library;
+}
+
 export function getBundleFileName(library: string) {
 	return 'bundles/' + library + '.js';
 }
+
 export function getBundleTempLocation(library: string) {
 	return LOC_TEMP + library + '.js';
 }
+
+export function getBundleMapTempLocation(library: string) {
+	return LOC_TEMP + library;
+}
+
 export function getLocalPackageList() {
 	return new TextFile(LOC_STORAGE + 'package-list.txt', 'utf8', true);
 }
@@ -77,6 +90,7 @@ export function getLocalPackageList() {
 export function getJspmConfigFile() {
 	return LOC_STORAGE + 'jspm.config.js';
 }
+
 export function getPackageConfigFile() {
 	return LOC_STORAGE + 'package.json';
 }

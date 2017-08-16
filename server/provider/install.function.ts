@@ -3,21 +3,25 @@ import {mergeInstalledPackage} from "../library/local-package-list";
 import {resolvePackageCmdItem} from "../library/package-name";
 import {generateJspmConfig} from "../route/jspm.config";
 import {createOpList} from "./cleanup.function";
-import {createDepCache} from "./jspm-functions";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export async function jspmBundleCache(name: string, opList: string[], handler: TransitionHandler) {
 	const [registry, base] = splitName(name);
 	const packageIndex = await resolvePackageCmdItem(name, handler);
 	
+	const args = [
+		'--inject',
+		'--source-map-contents',
+		'--no-mangle',
+		// '--skip-rollup',
+	];
+	if (JsonEnv.isDebug) {
+		args.push('--dev');
+	}
+	
 	await handler.create([
 		'bundle',
-		// '--skip-rollup',
-		'--minify',
-		'--inject',
-		// '--no-mangle',
-		//'--format', 'cjs',
-		'--source-map-contents',
+		...args,
 		packageIndex,
 		...opList,
 		`${getBundleLocation(base)}`,
@@ -62,7 +66,7 @@ export async function handleInstall(handler: TransitionHandler, spark: any, args
 		await removeFile(spark, getBundleTempLocation(base));
 	}
 	
-	await createDepCache(handler, spark);
+	// await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
 	generateJspmConfig();

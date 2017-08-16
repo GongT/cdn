@@ -4,7 +4,6 @@ import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/ren
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {removeInstalledPackage} from "../library/local-package-list";
 import {generateJspmConfig} from "../route/jspm.config";
-import {createDepCache} from "./jspm-functions";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export function findFullFormat(configs: SystemjsConfigFile[], packageBase: string) {
@@ -67,7 +66,7 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, ar
 	spark.write(`save jspm.config.js real content\n`);
 	await saveSystemjsConfigFileMultiParts(getJspmConfigFile(), configs);
 	
-	await createDepCache(handler, spark);
+	// await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
 	generateJspmConfig();

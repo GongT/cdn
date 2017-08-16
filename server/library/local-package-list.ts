@@ -27,3 +27,10 @@ export function removeInstalledPackage(packages: string[]) {
 export function installedPackages(): string[] {
 	return listFile.content.slice();
 }
+
+export function installedPackageNames(): string[] {
+	return listFile.content.map((e) => {
+		const [reg, base] = splitName(e);
+		return base;
+	});
+}

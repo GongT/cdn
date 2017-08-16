@@ -6,7 +6,14 @@ import {mkdirp, readFile, writeFile} from "fs-extra";
 import {dirname} from "path";
 import * as serveStataic from "serve-static";
 import {fileExists} from "../library/file-exists";
-import {getBundleLocation, getBundleTempLocation, getJspmConfigFile, getTempFolder} from "../library/files";
+import {
+	getBundleLocation,
+	getBundleMapLocation,
+	getBundleMapTempLocation,
+	getBundleTempLocation,
+	getJspmConfigFile,
+	getTempFolder,
+} from "../library/files";
 import {getBaseUrl} from "../simple-package/get-base";
 
 const s = (data: any) => {
@@ -34,25 +41,41 @@ export function mountLoader(app: Application) {
 		} else {
 			return res.status(HTTP.BAD_REQUEST).send('');
 		}
-		const file = getBundleLocation(name);
-		const temp = getBundleTempLocation(name);
-		if (!fileExists(file)) {
-			return res.status(HTTP.NOT_FOUND).send(`<h1>404 Not Found</h1><pre>${file}</pre>`);
-		}
-		
-		try {
-			await mkdirp(dirname(temp));
+		if (/\.map$/.test(name)) {
+			const file = getBundleMapLocation(name);
+			const temp = getBundleMapTempLocation(name);
+			if (!fileExists(file)) {
+				return res.status(HTTP.NOT_FOUND).send(`<h1>404 Not Found</h1><pre>${file}</pre>`);
+			}
+			try {
+				await mkdirp(dirname(temp));
+				let data = await readFile(file, {encoding: 'utf8'});
+				await writeFile(temp, data, {encoding: 'utf8'});
+				return next();
+			} catch (e) {
+				return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
+			}
+		} else {
+			const file = getBundleLocation(name);
+			const temp = getBundleTempLocation(name);
+			if (!fileExists(file)) {
+				return res.status(HTTP.NOT_FOUND).send(`<h1>404 Not Found</h1><pre>${file}</pre>`);
+			}
 			
-			let data = await readFile(file, {encoding: 'utf8'});
-			
-			data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
-			data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
-			data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
-			
-			await writeFile(temp, data, {encoding: 'utf8'});
-			next();
-		} catch (e) {
-			return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
+			try {
+				await mkdirp(dirname(temp));
+				
+				let data = await readFile(file, {encoding: 'utf8'});
+				
+				data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
+				data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
+				data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
+				
+				await writeFile(temp, data, {encoding: 'utf8'});
+				next();
+			} catch (e) {
+				return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
+			}
 		}
 	}, serveStataic(getTempFolder()));
 }
@@ -153,7 +176,7 @@ export function generateJspmConfig() {
 		// }
 		
 		var ret = {}, bundleList = [];
-		Object.keys(bundles).forEach((name) => {
+		Object.keys(bundles).forEach(function (name) {
 			bundleList.push({
 				length: bundles[name].length,
 				list: bundles[name],
