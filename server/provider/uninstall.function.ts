@@ -1,31 +1,26 @@
 import {SystemjsConfigFile} from "@gongt/ts-stl-client/jspm/defines";
-import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
+import {loadSystemjsConfigFile, loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
 import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm.write";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {removeInstalledPackage} from "../library/local-package-list";
 import {generateJspmConfig} from "../route/jspm.config";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
-export function findFullFormat(configs: SystemjsConfigFile[], packageBase: string) {
-	let ret: string = '';
-	configs.some((config) => {
-		if (config.map &&
-		    config.map[packageBase] &&
-		    (typeof config.map[packageBase] === 'string')
-		) {
-			ret = <string>config.map[packageBase];
-			return true;
-		}
-		if (config.browserConfig &&
-		    config.browserConfig.map &&
-		    config.browserConfig.map[packageBase] &&
-		    (typeof config.browserConfig.map[packageBase] === 'string')
-		) {
-			ret = <string>config.browserConfig.map[packageBase];
-			return true;
-		}
-	});
-	return ret;
+export function findFullFormat(packageBase: string) {
+	const config = loadSystemjsConfigFile(getJspmConfigFile());
+	if (config.map &&
+	    config.map[packageBase] &&
+	    (typeof config.map[packageBase] === 'string')
+	) {
+		return <string>config.map[packageBase];
+	}
+	if (config.browserConfig &&
+	    config.browserConfig.map &&
+	    config.browserConfig.map[packageBase] &&
+	    (typeof config.browserConfig.map[packageBase] === 'string')
+	) {
+		return <string>config.browserConfig.map[packageBase];
+	}
 }
 
 function removeBundles(spark: any, configs: SystemjsConfigFile[], packageBase: string) {
@@ -45,7 +40,7 @@ function removeBundles(spark: any, configs: SystemjsConfigFile[], packageBase: s
 export async function handleUninstall(handler: TransitionHandler, spark: any, args: string[]) {
 	let success: boolean;
 	const bases = args.map((name) => {
-		const [registry, base] = splitName(name);
+		const [_, base] = splitName(name);
 		return base;
 	});
 	const configs = loadSystemjsConfigFileMultiParts(getJspmConfigFile());

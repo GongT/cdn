@@ -1,4 +1,4 @@
-import {installedPackageNames, installedPackages} from "../library/local-package-list";
+import {installedPackages} from "../library/local-package-list";
 import {resolvePackageCmdItem} from "../library/package-name";
 
 export async function handleDisplayAll(handler, spark: any) {
@@ -6,13 +6,15 @@ export async function handleDisplayAll(handler, spark: any) {
 	spark.write('\t' + installedPackages().join('\n\t') + '');
 	spark.write('\n\n横向显示：\n');
 	const index = [];
+	const indexPackage = [];
 	for (const name of installedPackages()) {
 		const packageIndex = await resolvePackageCmdItem(name, handler);
-		index.push(packageIndex);
+		index.push(name);
+		indexPackage.push(packageIndex);
 	}
 	spark.write(index.join(' '));
 	spark.write('\n\n');
 	spark.write('\n\n横向 + 显示：\n');
-	spark.write(index.join(' + '));
+	spark.write(indexPackage.join(' + '));
 	spark.write('\n\n');
 }

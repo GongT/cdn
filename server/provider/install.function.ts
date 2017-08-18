@@ -1,22 +1,57 @@
-import {getBundleLocation, getBundleTempLocation} from "../library/files";
-import {mergeInstalledPackage} from "../library/local-package-list";
+import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
+import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
+import {installedPackageNames, mergeInstalledPackage} from "../library/local-package-list";
 import {resolvePackageCmdItem} from "../library/package-name";
 import {generateJspmConfig} from "../route/jspm.config";
-import {createOpList} from "./cleanup.function";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
-export async function jspmBundleCache(name: string, opList: string[], handler: TransitionHandler) {
+export async function jspmBundleCache(name: string, handler: TransitionHandler, spark: any, production: boolean) {
 	const [registry, base] = splitName(name);
 	const packageIndex = await resolvePackageCmdItem(name, handler);
+	const target = getBundleLocation(base);
+	const targetRel = getBundleFileName(base);
 	
 	const args = [
 		'--inject',
 		'--source-map-contents',
-		'--no-mangle',
-		// '--skip-rollup',
 	];
-	if (JsonEnv.isDebug) {
+	if (production) {
+		args.push('--no-mangle');
+	} else {
 		args.push('--dev');
+	}
+	
+	// const opList = await createOpList(name, handler);
+	
+	await handler.create([
+		'--log', 'warn',
+		'bundle',
+		...args,
+		packageIndex,
+		`${target}`,
+	]);
+	
+	const files = findBundle(targetRel);
+	if (!files) {
+		spark.write('\x1B[38;5;9mError: seems not success, bundle result file does not exists.\x1B[0m\n');
+		return;
+	}
+	spark.write('bundle success: ' + files.length + ' file includes.\n');
+	const reg: any = {};
+	for (const path of files) {
+		const l = /^[^\/]+?:@/.test(path)? 2 : 1;
+		const pkg = path.split('/', l).slice(0, l).join('/').replace(/\.json$/, '');
+		reg[pkg] = true;
+	}
+	
+	const opList = [];
+	const installed = installedPackageNames();
+	for (const item of Object.keys(reg)) {
+		const [_, b] = splitName(item);
+		if (b === base || installed.indexOf(b) === -1) {
+			continue;
+		}
+		opList.push('-', `${item}`, '-', `[${item}/**/*]`,);
 	}
 	
 	await handler.create([
@@ -24,8 +59,19 @@ export async function jspmBundleCache(name: string, opList: string[], handler: T
 		...args,
 		packageIndex,
 		...opList,
-		`${getBundleLocation(base)}`,
+		`${target}`,
 	]);
+}
+
+function findBundle(path: string): string {
+	const data = loadSystemjsConfigFile(getJspmConfigFile());
+	if (data.browserConfig && data.browserConfig.bundles && data.browserConfig.bundles[path]) {
+		return data.browserConfig.bundles[path];
+	}
+	if (data.bundles && data.bundles[path]) {
+		return data.bundles[path];
+	}
+	return null;
 }
 
 export async function handleInstallOnly(handler: TransitionHandler, spark: any, args: string[]) {
@@ -48,18 +94,8 @@ export async function handleInstall(handler: TransitionHandler, spark: any, args
 		return args.indexOf(n) === i;
 	});
 	
-	const argsOpList = args.map((name, index) => {
-		const extraOpList: string[] = createOpList(name)
-			.concat(
-				...args.filter((n, i) => i !== index).map((n) => ['-', n]),
-			);
-		return {
-			name,
-			opList: extraOpList,
-		};
-	});
-	for (let {name, opList} of argsOpList) {
-		await jspmBundleCache(name, opList, handler);
+	for (let name of args) {
+		await jspmBundleCache(name, handler, spark, true);
 		
 		const [registry, base] = splitName(name);
 		

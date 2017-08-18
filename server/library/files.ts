@@ -10,7 +10,8 @@ import {initRunJspm} from "./run-cmd";
 const ROOT = resolve(__dirname, '../..') + '/';
 
 const LOC_STORAGE = resolve(ROOT, 'source-storage') + '/';
-const LOC_BUNDLE = resolve(LOC_STORAGE, 'bundles') + '/';
+const LOC_BUNDLE_FOLDER = 'bundles';
+const LOC_BUNDLE = resolve(LOC_STORAGE, LOC_BUNDLE_FOLDER) + '/';
 
 const LOC_TEMP = resolve(tmpdir(), 'jspm-cdn') + '/';
 export const LOC_TEMPL = resolve(ROOT, 'public/template') + '/';
@@ -72,7 +73,7 @@ export function getBundleMapLocation(library: string) {
 }
 
 export function getBundleFileName(library: string) {
-	return 'bundles/' + library + '.js';
+	return LOC_BUNDLE_FOLDER + '/' + library + '.js';
 }
 
 export function getBundleTempLocation(library: string) {

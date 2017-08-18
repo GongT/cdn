@@ -11,7 +11,7 @@ if (!jspm) {
 	throw new Error('no jspm found.');
 }
 
-export function initRunJspm(...cmds:string[]) {
+export function initRunJspm(...cmds: string[]) {
 	const p = spawnSync(jspm, cmds, {
 		encoding: 'utf8',
 		cwd: getStorageBaseFolder(),
@@ -58,6 +58,8 @@ export function runJspm(...argument: string[]): Promise<{output: string}&ChildPr
 	});
 }
 
+const debug_data = createLogger(LOG_LEVEL.DATA, 'process');
+
 export function forkJspm(...argument: string[]): ChildProcess {
 	const child = spawnNative(jspm, argument, {
 		cwd: getStorageBaseFolder(),
@@ -65,13 +67,13 @@ export function forkJspm(...argument: string[]): ChildProcess {
 		env: process.env,
 	});
 	child.on('exit', () => {
-		console.log('jspm end: %s', argument);
+		debug_data('jspm end: %s', argument);
 	});
 	return child;
 }
 
 export async function tryRunJspm(context: DownloadRequestContext<any>,
-	...argument: string[]): Promise<{output: string}&ChildProcessResult<null>> {
+                                 ...argument: string[]): Promise<{output: string}&ChildProcessResult<null>> {
 	
 	try {
 		return await runJspm(...argument);
@@ -82,12 +84,13 @@ export async function tryRunJspm(context: DownloadRequestContext<any>,
 	}
 }
 
-const debug = createLogger(LOG_LEVEL.ERROR, 'process');
+const error = createLogger(LOG_LEVEL.ERROR, 'process');
+
 export function killProcess(process: ChildProcess, SIGNAL: string = 'SIGHUP'): Promise<string|number> {
 	return new Promise((resolve, reject) => {
 		let to = setTimeout(() => {
 			to = null;
-			debug('a process has force killed.');
+			error('a process has force killed.');
 			process.kill('SIGKILL');
 		}, 5000);
 		

@@ -1,5 +1,6 @@
 import {installedPackages} from "../library/local-package-list";
-import {handleCleanup} from "./cleanup.function";
+import {handleBuildCreate, handleBuildDelete} from "./build.function";
+import {handleBundleCreate, handleBundleDelete} from "./bundle.function";
 import {handleCommand} from "./command.function";
 import {handleConfigInit} from "./config-init.function";
 import {handleDisplayAll} from "./display-all.function";
@@ -48,12 +49,33 @@ async function handleFunction(lockId: string, handler: TransitionHandler, spark:
 	case 'update_cache':
 		return handleUpdateJspmConfigCache(handler, spark);
 	case 'update_dep_cache':
+		requireLock(lockId, spark);
 		return handleUpdateJspmDepCache(handler, spark);
 	case 'remove_dep_cache':
+		requireLock(lockId, spark);
 		return handleRemoveJspmDepCache(handler, spark);
-	case 'cleanup_bundles':
-		return handleCleanup(handler, spark, args);
+	case 'create_bundles_minify':
+		requireLock(lockId, spark);
+		return handleBundleCreate(handler, spark, args, true);
+	case 'create_bundles':
+		requireLock(lockId, spark);
+		return handleBundleCreate(handler, spark, args, false);
+	case 'delete_bundles':
+		requireLock(lockId, spark);
+		return handleBundleDelete(handler, spark, args);
+	case 'create_build_minify':
+		requireLock(lockId, spark);
+		return handleBuildCreate(handler, spark, true);
+	case 'create_build':
+		requireLock(lockId, spark);
+		return handleBuildCreate(handler, spark, false);
+	case 'delete_build':
+		requireLock(lockId, spark);
+		return handleBuildDelete(handler, spark);
 	case 'installed_show':
 		return handleDisplayAll(handler, spark);
 	}
 }
+
+
+

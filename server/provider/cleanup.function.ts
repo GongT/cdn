@@ -1,12 +1,12 @@
-import {loadSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm";
+import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
 import {getJspmConfigFile, getPackageConfigFile} from "../library/files";
+import {installedPackageNames, installedPackages} from "../library/local-package-list";
 import {generateJspmConfig} from "../route/jspm.config";
 import {jspmBundleCache} from "./install.function";
 import {splitName, TransitionHandler} from "./socket-handler";
-import {findFullFormat} from "./uninstall.function";
-import {installedPackages} from "../library/local-package-list";
 
 let timer, cache: string[];
+
 export function getDependencies(): string[] {
 	if (cache) {
 		return cache;
@@ -22,43 +22,38 @@ export function getDependencies(): string[] {
 	return cache = Object.keys(require(pkgFile).dependencies);
 }
 
-export function createOpList(name: string): string[] {
+async function allDepsOpList(name: string, handler: TransitionHandler): Promise<string[]> {
+	const oplist = [];
+	for (const name of installedPackageNames()) {
+		oplist.push('-', name);
+	}
+	return oplist;
+}
+
+export async function createOpList(name: string, handler: TransitionHandler): Promise<string[]> {
 	const opList = [];
 	const [registry, base] = splitName(name);
 	
-	const configs = loadSystemjsConfigFileMultiParts(getJspmConfigFile());
+	const config = loadSystemjsConfigFile(getJspmConfigFile());
+	const full = <string>config.map[base];
+	if (typeof full !== 'string') {
+		return allDepsOpList(name, handler)
+	}
+	const pkg = config.packages[full];
+	if (!pkg || !pkg.map) {
+		return allDepsOpList(name, handler)
+	}
+	const pkgs = Object.values(pkg.map);
 	
-	installedPackages().forEach((name) => {
-		if (name === base) {
-			return;
+	const installed = installedPackageNames();
+	for (const name of pkgs) {
+		const [_, base] = splitName(name);
+		if (installed.indexOf(base) === -1) {
+			continue;
 		}
 		
 		opList.push('-');
-		const fullPackageName = findFullFormat(configs, name);
-		if (fullPackageName) {
-			opList.push(`[${fullPackageName}/**/*]`);
-		} else {
-			opList.push(`[${name}/**/*]`);
-		}
-	});
-	return opList;
-}
-export async function handleCleanup(handler: TransitionHandler, spark: any, args: string[]) {
-	const list = args.length? args : installedPackages();
-	
-	spark.write(`bundles all:\n ::  ${list.join('\n ::  ')}\n`);
-	const argsOpList = list.map((name) => {
-		const opList: string[] = createOpList(name);
-		return {
-			name,
-			opList: opList,
-		};
-	});
-	for (let {name, opList} of argsOpList) {
-		spark.write(`bundle ${name}:\n`);
-		await jspmBundleCache(name, opList, handler);
+		opList.push(`[${name}/**/*]`);
 	}
-	
-	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	return opList;
 }
