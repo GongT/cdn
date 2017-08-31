@@ -1,5 +1,5 @@
-import {createLogger} from "@gongt/ts-stl-server/debug";
-import {LOG_LEVEL} from "@gongt/ts-stl-server/log/levels";
+import {createLogger} from "@gongt/ts-stl-library/log/debug";
+import {LOG_LEVEL} from "@gongt/ts-stl-library/log/levels";
 import {ChildProcess} from "child_process";
 import {unlink} from "fs-extra";
 import {fileExists} from "../library/file-exists";
@@ -101,6 +101,7 @@ export class TransitionHandler {
 }
 
 let globalLock: string = null;
+
 export function requireLock(lockId: string, spark: any) {
 	if (globalLock) {
 		throw new Error('jspm config has lock. must wait process finish.');
