@@ -1,7 +1,7 @@
 import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {installedPackageNames, mergeInstalledPackage} from "../library/local-package-list";
-import {resolvePackageCmdItem} from "../library/package-name";
+import {packageHasMainIndex, resolvePackageCmdItem} from "../library/package-name";
 import {generateJspmConfig} from "../route/jspm.config";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
@@ -51,7 +51,12 @@ export async function jspmBundleCache(name: string, handler: TransitionHandler, 
 		if (b === base || installed.indexOf(b) === -1) {
 			continue;
 		}
-		opList.push('-', `${item}`, '-', `[${item}/**/*]`,);
+		if (await packageHasMainIndex(item, handler)) {
+			opList.push('-', `${item}`);
+		} else {
+			opList.push('-', `[${item}*]`);
+		}
+		opList.push('-', `[${item}/**/*]`);
 	}
 	
 	await handler.create([
