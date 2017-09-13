@@ -55,6 +55,7 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, ar
 		removeBundles(spark, configs, base);
 		
 		await removeFile(spark, getBundleLocation(base));
+		await removeFile(spark, getBundleLocation(base) + '.map');
 		await removeFile(spark, getBundleTempLocation(base));
 	}
 	

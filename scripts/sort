@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd source-storage
+sort -dfbi package-list.txt > sort.tmp
+grep -v ':' sort.tmp > package-list.txt.new
+grep ':' sort.tmp >> package-list.txt.new
+unlink sort.tmp
+unlink package-list.txt
+
+mv package-list.txt.new package-list.txt

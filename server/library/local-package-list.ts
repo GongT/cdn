@@ -5,10 +5,16 @@ import {removePackageCmdItemCache} from "./package-name";
 const listFile = getLocalPackageList();
 
 export function mergeInstalledPackage(packages: string[]) {
+	const names = [];
 	for (let pkgName of packages) {
 		removePackageCmdItemCache(pkgName);
+		const [registry, base] = splitName(pkgName);
+		names.push(`${registry}:${base}`)
 	}
-	listFile.uniqueAppend(packages);
+	listFile.uniqueAppend(names);
+	listFile.content.sort((a, b) => {
+		return (a > b)? 1 : -1;
+	});
 	listFile.write();
 }
 
