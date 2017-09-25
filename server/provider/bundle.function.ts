@@ -5,7 +5,7 @@ import {unlink} from "fs-extra";
 import {fileExists} from "../library/file-exists";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {installedPackages} from "../library/local-package-list";
-import {generateJspmConfig} from "../route/jspm.config";
+import {updateJspmConfig} from "../route/jspm.config";
 import {jspmBundleCache} from "./install.function";
 import {splitName, TransitionHandler} from "./socket-handler";
 
@@ -19,7 +19,7 @@ export async function handleBundleCreate(handler: TransitionHandler, spark: any,
 	}
 	
 	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	updateJspmConfig();
 }
 
 export async function handleBundleDelete(handler: TransitionHandler, spark: any, args: string[]) {
@@ -60,7 +60,7 @@ async function unbundle(handler: TransitionHandler, spark: any, args: string[]) 
 	
 	await saveSystemjsConfigFileMultiParts(jspmFile, configs);
 	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	updateJspmConfig();
 	
 	setTimeout(async () => {
 		for (const file of filesToRemove) {

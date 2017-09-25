@@ -2,7 +2,7 @@ import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {installedPackageNames, mergeInstalledPackage} from "../library/local-package-list";
 import {packageHasMainIndex, resolvePackageCmdItem} from "../library/package-name";
-import {generateJspmConfig} from "../route/jspm.config";
+import {updateJspmConfig} from "../route/jspm.config";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export async function jspmBundleCache(name: string, handler: TransitionHandler, spark: any, production: boolean) {
@@ -83,7 +83,7 @@ export async function handleInstallOnly(handler: TransitionHandler, spark: any, 
 	await handler.create(['install', ...args]);
 	
 	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	updateJspmConfig();
 }
 
 export async function handleInstall(handler: TransitionHandler, spark: any, args: string[]) {
@@ -110,5 +110,5 @@ export async function handleInstall(handler: TransitionHandler, spark: any, args
 	// await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	updateJspmConfig();
 }

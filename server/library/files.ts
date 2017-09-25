@@ -13,13 +13,15 @@ const LOC_STORAGE = resolve(ROOT, 'source-storage') + '/';
 const LOC_BUNDLE_FOLDER = 'bundles';
 const LOC_BUNDLE = resolve(LOC_STORAGE, LOC_BUNDLE_FOLDER) + '/';
 
-const LOC_TEMP = resolve(tmpdir(), 'jspm-cdn') + '/';
+const LOC_TEMP = resolve(JsonEnv.isDebug? LOC_STORAGE : tmpdir(), 'jspm-cdn-temp') + '/';
 export const LOC_TEMPL = resolve(ROOT, 'public/template') + '/';
 const LOC_VIEWS = resolve(ROOT, 'public/view') + '/';
 
 export function initStorage() {
 	mkdirpSync(LOC_BUNDLE);
 	mkdirpSync(getTempFolder());
+	mkdirpSync(resolve(getTempFolder(), 'ie-storage'));
+	mkdirpSync(resolve(getTempFolder(), 'ie-bundle'));
 	
 	const pkg = getPackageConfigFile();
 	if (!fileExistsSync(pkg)) {

@@ -3,7 +3,7 @@ import {loadSystemjsConfigFile, loadSystemjsConfigFileMultiParts} from "@gongt/t
 import {saveSystemjsConfigFileMultiParts} from "@gongt/ts-stl-server/express/render/jspm.write";
 import {getBundleFileName, getBundleLocation, getBundleTempLocation, getJspmConfigFile} from "../library/files";
 import {removeInstalledPackage} from "../library/local-package-list";
-import {generateJspmConfig} from "../route/jspm.config";
+import {updateJspmConfig} from "../route/jspm.config";
 import {removeFile, splitName, TransitionHandler} from "./socket-handler";
 
 export function findFullFormat(packageBase: string) {
@@ -65,7 +65,7 @@ export async function handleUninstall(handler: TransitionHandler, spark: any, ar
 	// await createDepCache(handler, spark);
 	
 	spark.write(`update jspm.config.js cache content\n`);
-	generateJspmConfig();
+	updateJspmConfig();
 	
 	await handler.create(['clean']);
 }

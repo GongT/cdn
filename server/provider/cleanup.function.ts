@@ -1,7 +1,7 @@
 import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
 import {getJspmConfigFile, getPackageConfigFile} from "../library/files";
 import {installedPackageNames, installedPackages} from "../library/local-package-list";
-import {generateJspmConfig} from "../route/jspm.config";
+import {updateJspmConfig} from "../route/jspm.config";
 import {jspmBundleCache} from "./install.function";
 import {splitName, TransitionHandler} from "./socket-handler";
 

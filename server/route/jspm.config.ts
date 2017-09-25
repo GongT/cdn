@@ -1,95 +1,42 @@
-import {HTTP} from "@gongt/ts-stl-library/request/request";
+import {ExpressAppBuilder} from "@gongt/ts-stl-server/boot/express-app-builder";
 import {loadSystemjsConfigFile} from "@gongt/ts-stl-server/express/render/jspm";
-import {Router} from "express";
-import {Application} from "express-serve-static-core";
-import {mkdirp, readFile, writeFile} from "fs-extra";
-import {dirname} from "path";
-import * as serveStataic from "serve-static";
-import {fileExists} from "../library/file-exists";
-import {
-	getBundleFolder,
-	getBundleLocation,
-	getBundleMapLocation,
-	getBundleMapTempLocation,
-	getBundleTempLocation,
-	getJspmConfigFile,
-	getTempFolder,
-} from "../library/files";
-import {getBaseUrl} from "../simple-package/get-base";
+import {getBundleFolder, getJspmConfigFile, getStorageBaseFolder,} from "../library/files";
+import {handleInternetExplorer} from "../library/internet-explorer";
 
 const s = (data: any) => {
 	return JSON.stringify(data);
 };
-let fileContent: string;
 
-export function mountLoader(app: Application) {
-	generateJspmConfig();
+let jspmConfigTemplate: TemplateFunction;
+
+export function mountLoader(builder: ExpressAppBuilder) {
+	updateJspmConfig();
 	
-	app.get('/jspm.config.js', (req, res, next) => {
+	builder.prependMiddleware('/jspm.config.js', (req, res, next) => {
 		res.header('Content-Type', 'text/javascript; charset=utf8');
-		
-		res.send(fileContent);
+		res.send(jspmConfigTemplate(s(req.hostname)));
 	});
 	
-	const router = Router();
-	app.use('/load-bundles', router);
-	router.get(['/:file', '/:scope/:package'],
-		serveStataic(getTempFolder()),
-		serveStataic(getBundleFolder()),
-		bundleFileSourceProcessor,
-		serveStataic(getTempFolder()));
+	const storageOpt = {
+		fallthrough: false,
+		redirect: false,
+	};
+	builder.mountPublic('/storage/', getStorageBaseFolder(), storageOpt);
+	
+	builder.mountPublic('/load-bundles', getBundleFolder(), {
+		fallthrough: false,
+		redirect: false,
+	});
+	
+	handleInternetExplorer(builder);
 }
 
-async function bundleFileSourceProcessor(req, res, next) {
-	let name;
-	if (req.params.scope && req.params.package) {
-		name = req.params.scope + '/' + req.params.package.replace(/\.js$/, '');
-	} else if (req.params.file) {
-		name = req.params.file.replace(/\.js$/, '');
-	} else {
-		return res.status(HTTP.BAD_REQUEST).send('');
-	}
-	if (/\.map$/.test(name)) {
-		const file = getBundleMapLocation(name);
-		const temp = getBundleMapTempLocation(name);
-		if (!fileExists(file)) {
-			return res.status(HTTP.NOT_FOUND).send(`<h1>404 Not Found</h1><pre>${file}</pre>`);
-		}
-		try {
-			await mkdirp(dirname(temp));
-			let data = await readFile(file, {encoding: 'utf8'});
-			await writeFile(temp, data, {encoding: 'utf8'});
-			return next();
-		} catch (e) {
-			return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
-		}
-	} else {
-		const file = getBundleLocation(name);
-		const temp = getBundleTempLocation(name);
-		if (!fileExists(file)) {
-			return res.status(HTTP.NOT_FOUND).send(`<h1>404 Not Found</h1><pre>${file}</pre>`);
-		}
-		
-		try {
-			await mkdirp(dirname(temp));
-			
-			let data = await readFile(file, {encoding: 'utf8'});
-			
-			// data = data.replace(/System.registerDynamic\("npm:/g, 'System.registerDynamic("jspmcdn-npm:');
-			// data = data.replace(/System.registerDynamic\("github:/g, 'System.registerDynamic("jspmcdn-github:');
-			// data = data.replace(/System.registerDynamic\("jspm:/g, 'System.registerDynamic("jspmcdn-jspm:');
-			
-			await writeFile(temp, data, {encoding: 'utf8'});
-			next();
-		} catch (e) {
-			return res.status(HTTP.INTERNAL_SERVER_ERROR).send(e);
-		}
-	}
-}
+type TemplateFunction = (rootUrl: string) => string;
 
-export function generateJspmConfig() {
+function createReplacer(): TemplateFunction {
+	// TODO: replace with stl
+	const APP_RUN_PORT: number = parseInt(process.env.LISTEN_PORT) || 80;
 	const file = getJspmConfigFile();
-	const rootUrl = getBaseUrl();
 	
 	let config = loadSystemjsConfigFile(file);
 	
@@ -105,27 +52,34 @@ export function generateJspmConfig() {
 	delete config.devConfig;
 	
 	let text = JSON.stringify(config, null, 2);
-	// text = text.replace(/"npm:/g, '"jspmcdn-npm:');
-	// text = text.replace(/"github:/g, '"jspmcdn-github:');
-	// text = text.replace(/"jspm:/g, '"jspmcdn-jspm:');
-	
 	config = JSON.parse(text); // confirm
 	
 	// lang=javascript
-	fileContent = `/* generated file */
+	let fileContent = `/* generated file */
 (function (System, Local, configData) {
 	if(!Array.prototype.forEach){
 		alert('your browser is too old.');
 		throw new Error('IE < 9');
 	}
-	var domain = ${s(rootUrl)};
+	var domain = CLIENT_BASE_URL_REPLACE;
+	if (!/https?:\\/\\//i.test(domain) && !/^\\/\\//.test(domain)){
+		domain = '//' + domain;
+	}
 	if (/^\\/\\//.test(domain)) {
 		domain = location.protocol + domain;
 	}
 	if (!/\\/$/.test(domain)) {
-		domain += '/';
+		domain += '${APP_RUN_PORT? `:${APP_RUN_PORT}` : ''}/';
 	}
-	var storageUrl = domain + 'storage/';
+	
+	var storageFolder = 'storage/';
+	var loadBundle = 'load-';
+	var isIE = /*@cc_on!@*/false || !!document.documentMode;
+	if (isIE) {
+		storageFolder = 'ie-storage/';
+		loadBundle = 'load-ie-';
+	}
+	var storageUrl = domain + storageFolder;
 	
 	if(configData.browserConfig) {
 		configData.browserConfig.baseURL = storageUrl;
@@ -162,7 +116,6 @@ export function generateJspmConfig() {
 		var isEdge = /Edge\\/\\d+/.test(navigator.userAgent);
 		if(isEdge) return true;
 		
-		var isIE = /*@cc_on!@*/false || !!document.documentMode;
 		if(isIE) {
 			var isIE11 = /rv:11/.test(navigator.userAgent);
 			var isWin10 = /Windows NT 10/i.test(navigator.userAgent);
@@ -187,7 +140,7 @@ export function generateJspmConfig() {
 			bundleList.push({
 				length: bundles[name].length,
 				list: bundles[name],
-				name: domain + 'load-' + name
+				name: domain + loadBundle + name
 			});
 		});
 		bundleList.sort(function (configA, configB){
@@ -218,4 +171,11 @@ export function generateJspmConfig() {
 	
 	window.__debug_Local = Local;
 })(SystemJS, new System.constructor(), ${s(config)})`;
+	
+	fileContent = s(fileContent);
+	return (void 0 || eval)("(rootUrl) => " + fileContent.replace('CLIENT_BASE_URL_REPLACE', '" + rootUrl + "'));
+}
+
+export function updateJspmConfig() {
+	jspmConfigTemplate = createReplacer();
 }

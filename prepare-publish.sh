@@ -3,6 +3,8 @@
 set -e
 set -x
 
+ncu -a -u
+
 tsc -p server
 tsc -p client
 tsc -p server/simple-package
