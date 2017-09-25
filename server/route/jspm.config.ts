@@ -35,7 +35,9 @@ type TemplateFunction = (rootUrl: string) => string;
 
 function createReplacer(): TemplateFunction {
 	// TODO: replace with stl
-	const APP_RUN_PORT: number = parseInt(process.env.LISTEN_PORT) || 80;
+	const APP_RUN_PORT: number = (process.env.RUN_IN_DOCKER)
+		? null
+		: parseInt(process.env.LISTEN_PORT) || 80;
 	const file = getJspmConfigFile();
 	
 	let config = loadSystemjsConfigFile(file);
@@ -69,7 +71,11 @@ function createReplacer(): TemplateFunction {
 		domain = location.protocol + domain;
 	}
 	if (!/\\/$/.test(domain)) {
-		domain += '${APP_RUN_PORT? `:${APP_RUN_PORT}` : ''}/';
+		if(!/^https:\\/\\//.test(domain)) {
+			domain += '${APP_RUN_PORT? `:${APP_RUN_PORT}` : ''}/';
+		} else {
+			domain += '/';
+		}
 	}
 	
 	var storageFolder = 'storage/';
