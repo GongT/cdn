@@ -1,6 +1,6 @@
 {
 	"name": "@gongt/jspm",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
@@ -16,7 +16,10 @@
 	},
 	"homepage": "https://github.com/GongT/jspm-cdn#readme",
 	"private": false,
-	"dependencies": {},
+	"dependencies": {
+		"babel-core": "^6.26.0",
+		"babel-preset-env": "^1.6.0"
+	},
 	"devDependencies": {
 	}
 }
